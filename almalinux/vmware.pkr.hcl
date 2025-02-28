@@ -7,13 +7,16 @@ packer {
   }
 }
 
-source "vmware-iso" "base" {
-  iso_url = "iso/AlmaLinux-9.5-x86_64-dvd.iso"
-  iso_checksum = "none"
-  guest_os_type = ""
+source "vmware-iso" "almalinux" {
+  display_name = "almalinux"
+  output_directory = "./temp"
+
+  iso_url = "./iso/AlmaLinux-9.5-x86_64-dvd.iso"
+  iso_checksum = "./iso/AlmaLinux-9.5-x86_64-dvd.iso.sha256"
+  guest_os_type = "almalinux"
   
   ssh_timeout = "30m"
-  ssh_username = "user"
+  ssh_username = "admin"
   ssh_password = "abcd1234"
   shutdown_command = "echo 'abcd1234' | sudo -S shutdown -P now"
 
@@ -45,11 +48,23 @@ source "vmware-iso" "base" {
 
 build {
   sources = [
-    "source.vmware-iso.base"
+    "source.vmware-iso.almalinux"
   ]
   provisioner "shell" {
     scripts = [
       "script/set-repo.sh"
     ]
+  }
+  
+  post-processor "checcksum" {
+    checksum_types = [ "sha256" ]
+    output = "packer_{{.BuildName}}_{{.BuilderType}}.{{.ChecksumType}}"
+  }
+  post-processor "compress" {
+    output = "packer_{{.BuildName}}.gz"
+  }
+  post-processor "manifest" {
+    output = "packer_{{.BuildName}}_manifest.json"
+    strip_path = true
   }
 }
