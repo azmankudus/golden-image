@@ -1,16 +1,28 @@
-# Cache objects
-packer_cache/
+# Ignore all
+/**
 
-# Crash log
-crash.log
+# Standard repository files
+!/.gitignore
+!/CODE_OF_CONDUCT.md
+!/CONTRIBUTING.md
+!/LICENSE
+!/README.md
+!/SECURITY.md
+!/SUPPORT.md
+!/CHANGELOG.md
+!/CONTRIBUTORS.md
+!/AUTHORS.md
+!/ACKNOWLEDGMENTS.md
+!/CODEOWNERS.md
+!/ISSUE_TEMPLATE.md
+!/PULL_REQUEST_TEMPLATE.md
+!/ISSUE_TEMPLATE/
+!/ISSUE_TEMPLATE/*
+!/PULL_REQUEST_TEMPLATE
+!/PULL_REQUEST_TEMPLATE/*
 
-# https://www.packer.io/guides/hcl/variables
-# Exclude all .pkrvars.hcl files, which are likely to contain sensitive data, 
-# such as password, private keys, and other secrets. These should not be part of 
-# version control as they are data points which are potentially sensitive and 
-# subject to change depending on the environment.
-#
-*.pkrvars.hcl
-
-# For built boxes
-*.box
+# Packer files and resources
+!/*/
+!/*/*.pkr.hcl
+!/*/res/
+!/*/res/*
