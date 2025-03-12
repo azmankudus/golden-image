@@ -46,5 +46,5 @@ cat /etc/packer.build
 
 EOF
 
-echo 'abcd1234' | sudo -S bash ~/provision.sh
+echo 'P@ssw0rd' | sudo -S bash ~/provision.sh
 rm -f ~/provision.sh
