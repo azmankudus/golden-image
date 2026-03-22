@@ -25,12 +25,13 @@ source "qemu" "win2022" {
   net_device       = var.net_device
   disk_interface   = "virtio"
   boot_wait        = "3s"
+  boot_command     = ["<enter><wait><enter>"]
   cpus             = var.cpus
   memory           = var.memory
   headless         = var.headless
   floppy_files     = ["../../unattended/autounattend.xml"]
   qemuargs = var.tools_iso != "" ? [
-    ["-drive", "file=${var.tools_iso},media=cdrom"]
+    ["-drive", "file=${var.tools_iso},media=cdrom,index=2"]
   ] : []
 }
 

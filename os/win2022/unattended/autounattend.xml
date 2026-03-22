@@ -16,7 +16,7 @@
             <RunSynchronous>
                 <RunSynchronousCommand wcm:action="add">
                     <Order>1</Order>
-                    <Path>cmd.exe /c "FOR %i IN (C D E F G H I J K) DO IF EXIST %i:\viostor\2k22\amd64\viostor.inf (drvload %i:\viostor\2k22\amd64\viostor.inf &amp; drvload %i:\NetKVM\2k22\amd64\netkvm.inf &amp; drvload %i:\vioscsi\2k22\amd64\vioscsi.inf)"</Path>
+                    <Path>cmd.exe /c "FOR %i IN (C D E F G H I J K L M N O P Q R S T U V W X Y Z) DO IF EXIST %i:\viostor\2k22\amd64\viostor.inf (drvload %i:\viostor\2k22\amd64\viostor.inf &amp; drvload %i:\NetKVM\2k22\amd64\netkvm.inf &amp; drvload %i:\vioscsi\2k22\amd64\vioscsi.inf)"</Path>
                 </RunSynchronousCommand>
             </RunSynchronous>
             <DiskConfiguration>
