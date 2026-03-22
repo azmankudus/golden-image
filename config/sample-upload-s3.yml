@@ -1,0 +1,8 @@
+type: s3
+destination: "my-golden-images-bucket/windows-images"
+credentials:
+  aws_access_key: "AKIAIOSFODNN7EXAMPLE"
+  aws_secret_key: "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+  aws_region: "us-east-1"
+compress: true
+checksum: true

@@ -1,0 +1,7 @@
+endpoint: "https://proxmox.local.domain:8006/api2/json"
+username: "root@pam!packer"
+password: "pve-api-token-secret"
+insecure_connection: true
+cluster: "pve1"
+datastore: "local-lvm"
+network: "vmbr0"

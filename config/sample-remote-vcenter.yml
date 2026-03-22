@@ -1,0 +1,9 @@
+endpoint: "vcenter.local.domain"
+username: "administrator@vsphere.local"
+password: "SuperSecretPassword123!"
+insecure_connection: true
+datacenter: "Datacenter1"
+cluster: "Cluster1"
+datastore: "datastore1"
+network: "VM Network"
+folder: "Templates"

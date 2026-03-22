@@ -1,0 +1,6 @@
+type: vagrantcloud
+destination: "my-org/win2022-base"
+credentials:
+  token: "vagrant_cloud_token_abc123_xyz"
+compress: true
+checksum: true

@@ -1,0 +1,21 @@
+os: win2022
+description: Custom Windows Server 2022 image with extra data disk
+iso_url: "https://software-download.microsoft.com/download/pr/20348.169.210806-2348.fe_release_svc_refresh_SERVER_EVAL_x64FRE_en-us.iso"
+iso_checksum: "sha256:4f1457c4fe14ce48c9b2324924f33ca4f0470475e661bb16d0033abaf2ebde1e"
+default_cpu: 4
+default_memory: 8192
+disks:
+  - name: os
+    size_mb: 102400
+    controller: scsi
+  - name: data
+    size_mb: 204800
+    controller: scsi
+modes:
+  base:
+    scripts:
+      - setup.ps1
+  hardened:
+    scripts:
+      - setup.ps1
+      - harden.ps1

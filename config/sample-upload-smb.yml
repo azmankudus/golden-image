@@ -1,0 +1,7 @@
+type: smb
+destination: "//nas.local.domain/images/windows"
+credentials:
+  username: "service_account"
+  password: "SecretPassword123!"
+compress: false
+checksum: true
