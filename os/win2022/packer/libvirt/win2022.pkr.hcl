@@ -28,9 +28,9 @@ source "qemu" "win2022" {
   cpus             = var.cpus
   memory           = var.memory
   headless         = var.headless
-  cd_files         = ["../../unattended/autounattend.xml"]
+  floppy_files     = ["../../unattended/autounattend.xml"]
   qemuargs = var.tools_iso != "" ? [
-    ["-cdrom", "${var.tools_iso}"]
+    ["-drive", "file=${var.tools_iso},media=cdrom"]
   ] : []
 }
 

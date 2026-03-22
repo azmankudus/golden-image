@@ -1,21 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
     <settings pass="windowsPE">
+        <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <SetupUILanguage>
+                <UILanguage>en-US</UILanguage>
+            </SetupUILanguage>
+            <InputLocale>en-US</InputLocale>
+            <SystemLocale>en-US</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UILanguageFallback>en-US</UILanguageFallback>
+            <UserLocale>en-US</UserLocale>
+        </component>
         <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
             <RunSynchronous>
                 <RunSynchronousCommand wcm:action="add">
                     <Order>1</Order>
-                    <Path>cmd.exe /c "FOR %i IN (C D E F G H I) DO IF EXIST %i:\viostor\2k22\amd64\viostor.inf (drvload %i:\viostor\2k22\amd64\viostor.inf &amp; drvload %i:\NetKVM\2k22\amd64\netkvm.inf &amp; drvload %i:\vioscsi\2k22\amd64\vioscsi.inf)"</Path>
+                    <Path>cmd.exe /c "FOR %i IN (C D E F G H I J K) DO IF EXIST %i:\viostor\2k22\amd64\viostor.inf (drvload %i:\viostor\2k22\amd64\viostor.inf &amp; drvload %i:\NetKVM\2k22\amd64\netkvm.inf &amp; drvload %i:\vioscsi\2k22\amd64\vioscsi.inf)"</Path>
                 </RunSynchronousCommand>
             </RunSynchronous>
-            <UserData>
-                <AcceptEula>true</AcceptEula>
-                <ProductKey>
-                    <!-- KMS Client Setup Key for Windows Server 2022 Standard -->
-                    <Key>VDYBN-27WPP-V4HQT-9VMD4-VMK7H</Key>
-                    <WillShowUI>OnError</WillShowUI>
-                </ProductKey>
-            </UserData>
             <DiskConfiguration>
                 <Disk wcm:action="add">
                     <DiskID>0</DiskID>
@@ -32,7 +34,7 @@
                             <Order>1</Order>
                             <PartitionID>1</PartitionID>
                             <Letter>C</Letter>
-                            <Label>Windows</Letter>
+                            <Label>Windows</Label>
                             <Format>NTFS</Format>
                         </ModifyPartition>
                     </ModifyPartitions>
@@ -40,28 +42,27 @@
             </DiskConfiguration>
             <ImageInstall>
                 <OSImage>
+                    <InstallFrom>
+                        <MetaData wcm:action="add">
+                            <Key>/IMAGE/INDEX</Key>
+                            <Value>1</Value>
+                        </MetaData>
+                    </InstallFrom>
                     <InstallTo>
                         <DiskID>0</DiskID>
                         <PartitionID>1</PartitionID>
                     </InstallTo>
-                    <InstallFrom>
-                        <MetaData wcm:action="add">
-                            <Key>/IMAGE/NAME</Key>
-                            <Value>Windows Server 2022 SERVERSTANDARDCORE</Value>
-                        </MetaData>
-                    </InstallFrom>
                 </OSImage>
             </ImageInstall>
-        </component>
-        <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
-            <SetupUILanguage>
-                <UILanguage>en-US</UILanguage>
-            </SetupUILanguage>
-            <InputLocale>0409:00000409</InputLocale>
-            <SystemLocale>en-US</SystemLocale>
-            <UILanguage>en-US</UILanguage>
-            <UILanguageFallback>en-US</UILanguageFallback>
-            <UserLocale>en-US</UserLocale>
+            <UserData>
+                <ProductKey>
+                    <Key>VDYBN-27WPP-V4HQT-9VMD4-VMK7H</Key>
+                    <WillShowUI>OnError</WillShowUI>
+                </ProductKey>
+                <AcceptEula>true</AcceptEula>
+                <FullName>Administrator</FullName>
+                <Organization>Packer</Organization>
+            </UserData>
         </component>
     </settings>
     <settings pass="oobeSystem">
@@ -72,7 +73,7 @@
                     <PlainText>true</PlainText>
                 </Password>
                 <Enabled>true</Enabled>
-                <LogonCount>1</LogonCount>
+                <LogonCount>2</LogonCount>
                 <Username>Administrator</Username>
             </AutoLogon>
             <OOBE>
