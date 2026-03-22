@@ -29,7 +29,7 @@
 !/golden-image.sh
 !/golden-image.ps1
 !/.agent/
-!/.agent/*
+!/.agent/**
 !/schema/
 !/schema/*
 !/os/
