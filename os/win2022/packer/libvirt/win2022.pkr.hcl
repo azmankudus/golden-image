@@ -30,7 +30,7 @@ source "qemu" "win2022" {
   headless         = var.headless
   cd_files         = ["../../unattended/autounattend.xml"]
   qemuargs = var.tools_iso != "" ? [
-    ["-drive", "file=${var.tools_iso},media=cdrom"]
+    ["-cdrom", "${var.tools_iso}"]
   ] : []
 }
 
