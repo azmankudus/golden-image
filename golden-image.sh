@@ -10,7 +10,7 @@ usage() {
     echo "  --os <name>            Specify the OS template (e.g., win2022)"
     echo "  --virt <type>          Virtualization option: "
     echo "                           Local: libvirt, virtualbox, vmware-workstation"
-    echo "                           Remote: vmware-esxi, vmware-vcenter, proxmox, xcp-ng"
+    echo "                           Remote: vmware-esxi, vmware-vcenter, proxmox, xcp-ng, hyperv"
     echo "  --cpu <cores>          Number of CPUs (overrides default)"
     echo "  --memory <mb>          Memory size in MB (overrides default)"
     echo "  --disk-size <mb>       Main disk size in MB (overrides default)"
@@ -19,6 +19,7 @@ usage() {
     echo "  --setup-mode <type>    Setup mode (e.g., server, core, desktop, workstation)"
     echo "  --remote-config <file> Specify JSON/YAML file for remote target configuration (e.g., vCenter, Proxmox)"
     echo "  --upload-config <file> Specify JSON/YAML file for upload destination (e.g., local, S3, SMB)"
+    echo "  --gui                  Show the VM screen (disable headless mode for local builds)"
     echo "  --name <name>          Override output VM name"
     echo "  --net-device <name>    Override network device name (e.g., virtio-net)"
     echo "  --iso <uri>            Override OS ISO (supports http/s, ftp, sftp, s3, smb, file://, relative, absolute)"
@@ -43,6 +44,7 @@ MODE="base"
 SETUP_MODE=""
 REMOTE_CONFIG=""
 UPLOAD_CONFIG=""
+GUI=0
 ISO=""
 ISO_CHECKSUM=""
 TOOLS_ISO=""
@@ -62,6 +64,7 @@ while [[ $# -gt 0 ]]; do
         --setup-mode) SETUP_MODE="$2"; shift 2 ;;
         --remote-config) REMOTE_CONFIG="$2"; shift 2 ;;
         --upload-config) UPLOAD_CONFIG="$2"; shift 2 ;;
+        --gui) GUI=1; shift ;;
         --name) VM_NAME="$2"; shift 2 ;;
         --net-device) NET_DEVICE="$2"; shift 2 ;;
         --iso) ISO="$2"; shift 2 ;;
@@ -142,6 +145,11 @@ OUTPUT_DIR="$PWD/output/$OS-$VIRT"
 
 PACKER_ARGS=()
 PACKER_ARGS+=("-var" "output_dir=$OUTPUT_DIR")
+
+if [[ $GUI -eq 1 ]]; then
+    PACKER_ARGS+=("-var" "headless=false")
+    echo "GUI Mode: Enabled"
+fi
 
 if [[ -n "$SETUP_MODE" ]]; then
     PACKER_ARGS+=("-var" "setup_mode=$SETUP_MODE")

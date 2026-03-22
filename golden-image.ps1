@@ -14,7 +14,8 @@ param(
     [string]$NetDevice,
     [string]$Iso,
     [string]$IsoChecksum,
-    [string]$ToolsIso
+    [string]$ToolsIso,
+    [switch]$Gui
 )
 
 if ($List) {
@@ -101,6 +102,11 @@ $OutputDir = (Resolve-Path "output").Path + "\$Os-$Virt"
 
 $PackerArgs = @()
 $PackerArgs += "-var", "output_dir=$OutputDir"
+
+if ($Gui) {
+    $PackerArgs += "-var", "headless=false"
+    Write-Host "GUI Mode: Enabled"
+}
 
 if ($SetupMode) {
     $PackerArgs += "-var", "setup_mode=$SetupMode"

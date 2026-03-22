@@ -7,7 +7,7 @@ Welcome to the **Golden Image Builder**! This project provides a universal, scal
 - **Multi-OS Support**: Effortlessly add Windows, Linux, or any custom OS via modular folders.
 - **Agnostic Virtualization**: Works flawlessly with:
   - 🖥️ **Local**: Libvirt/Qemu, VirtualBox, VMware Workstation.
-  - ☁️ **Remote**: VMware ESXi, VMware vCenter, Proxmox, XCP-ng.
+  - ☁️ **Remote**: VMware ESXi, VMware vCenter, Proxmox, XCP-ng, Hyper-V.
 - **Customizable Resources**: Dynamically adjust CPU, Memory, and Disk Layout configurations on the fly.
 - **Flexible Modes**:
   - `base`: Minimal, clean installation.
@@ -51,9 +51,11 @@ Welcome to the **Golden Image Builder**! This project provides a universal, scal
 ./golden-image.sh --os win2022 --virt libvirt --mode base
 
 # Create Windows Server 2022 Base Image with specific setup mode, ISOs, and custom hardware
+# Additionally, display the GUI screen during the build process
 ./golden-image.sh --os win2022 --virt libvirt --mode base \
   --cpu 1 --memory 1024 --disk-size 204800 \
   --setup-mode "server core" \
+  --gui \
   --iso "file:///work/iso/en-us_windows_server_2022_updated_feb_2026_x64_dvd_09efea0d.iso" \
   --tools-iso "file:///work/iso/virtio-win-0.1.285.iso"
 
