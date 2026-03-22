@@ -28,8 +28,8 @@
 !/*/res/*
 !/golden-image.sh
 !/golden-image.ps1
-!/.agent/
-!/.agent/**
+!/.agents/
+!/.agents/**
 !/schema/
 !/schema/*
 !/config/
