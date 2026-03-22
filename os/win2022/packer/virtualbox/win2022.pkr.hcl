@@ -18,7 +18,7 @@ source "virtualbox-iso" "win2022" {
   ssh_username     = "Administrator"
   ssh_password     = "Vagrant1!"
   ssh_timeout      = "1h"
-  vm_name          = "win2022"
+  vm_name          = var.vm_name
   cpus             = var.cpus
   memory           = var.memory
   headless         = var.headless

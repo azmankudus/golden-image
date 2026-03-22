@@ -19,7 +19,10 @@ usage() {
     echo "  --setup-mode <type>    Setup mode (e.g., server, core, desktop, workstation)"
     echo "  --remote-config <file> Specify JSON/YAML file for remote target configuration (e.g., vCenter, Proxmox)"
     echo "  --upload-config <file> Specify JSON/YAML file for upload destination (e.g., local, S3, SMB)"
+    echo "  --name <name>          Override output VM name"
+    echo "  --net-device <name>    Override network device name (e.g., virtio-net)"
     echo "  --iso <uri>            Override OS ISO (supports http/s, ftp, sftp, s3, smb, file://, relative, absolute)"
+    echo "  --iso-checksum <sum>   Specify ISO checksum (e.g. sha256:..., or 'none')"
     echo "  --tools-iso <uri>      Specify tools ISO (supports http/s, ftp, sftp, s3, smb, file://, relative, absolute)"
     echo "  --help                 Show this help message"
     exit 1
@@ -41,7 +44,10 @@ SETUP_MODE=""
 REMOTE_CONFIG=""
 UPLOAD_CONFIG=""
 ISO=""
+ISO_CHECKSUM=""
 TOOLS_ISO=""
+VM_NAME=""
+NET_DEVICE=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -56,7 +62,10 @@ while [[ $# -gt 0 ]]; do
         --setup-mode) SETUP_MODE="$2"; shift 2 ;;
         --remote-config) REMOTE_CONFIG="$2"; shift 2 ;;
         --upload-config) UPLOAD_CONFIG="$2"; shift 2 ;;
+        --name) VM_NAME="$2"; shift 2 ;;
+        --net-device) NET_DEVICE="$2"; shift 2 ;;
         --iso) ISO="$2"; shift 2 ;;
+        --iso-checksum) ISO_CHECKSUM="$2"; shift 2 ;;
         --tools-iso) TOOLS_ISO="$2"; shift 2 ;;
         --help|-h) usage ;;
         *) echo "Unknown option: $1"; usage ;;
@@ -139,6 +148,16 @@ if [[ -n "$SETUP_MODE" ]]; then
     echo "Setup Mode: $SETUP_MODE"
 fi
 
+if [[ -n "$VM_NAME" ]]; then
+    PACKER_ARGS+=("-var" "vm_name=$VM_NAME")
+    echo "VM Name: $VM_NAME"
+fi
+
+if [[ -n "$NET_DEVICE" ]]; then
+    PACKER_ARGS+=("-var" "net_device=$NET_DEVICE")
+    echo "Net Device: $NET_DEVICE"
+fi
+
 if [[ -n "$CPU" ]]; then
     PACKER_ARGS+=("-var" "cpus=$CPU")
     echo "Overrides CPU: $CPU"
@@ -173,6 +192,13 @@ if [[ -n "$ISO" ]]; then
     RESOLVED_ISO=$(resolve_or_fetch_iso "$ISO" "$ISO_CACHE_DIR")
     echo "Using OS ISO: $RESOLVED_ISO"
     PACKER_ARGS+=("-var" "iso_url=file://$RESOLVED_ISO")
+    if [[ -z "$ISO_CHECKSUM" ]]; then
+        ISO_CHECKSUM="none"
+    fi
+fi
+
+if [[ -n "$ISO_CHECKSUM" ]]; then
+    PACKER_ARGS+=("-var" "iso_checksum=$ISO_CHECKSUM")
 fi
 
 if [[ -n "$TOOLS_ISO" ]]; then
@@ -194,9 +220,11 @@ fi
 
 cd "$VIRT_DIR"
 
+echo "Initializing Packer plugins..."
+packer init .
+
 echo "Running: packer build ${PACKER_ARGS[@]} ."
-# Uncomment to execute
-# packer build "${PACKER_ARGS[@]}" .
+packer build "${PACKER_ARGS[@]}" .
 
 if [[ -n "$UPLOAD_CONFIG" ]]; then
     echo ""

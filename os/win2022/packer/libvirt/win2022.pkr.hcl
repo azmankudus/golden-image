@@ -19,8 +19,8 @@ source "qemu" "win2022" {
   ssh_username     = "Administrator"
   ssh_password     = "Vagrant1!"
   ssh_timeout      = "1h"
-  vm_name          = "win2022.qcow2"
-  net_device       = "virtio-net"
+  vm_name          = var.vm_name
+  net_device       = var.net_device
   disk_interface   = "virtio"
   boot_wait        = "3s"
   cpus             = var.cpus

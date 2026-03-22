@@ -30,6 +30,14 @@ variable "setup_mode" {
   type    = string
   default = "standard"
 }
+variable "vm_name" {
+  type    = string
+  default = "win2022.qcow2"
+}
+variable "net_device" {
+  type    = string
+  default = "virtio-net"
+}
 variable "headless" {
   type    = bool
   default = true

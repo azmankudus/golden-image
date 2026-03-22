@@ -10,7 +10,10 @@ param(
     [string]$SetupMode,
     [string]$RemoteConfig,
     [string]$UploadConfig,
+    [string]$Name,
+    [string]$NetDevice,
     [string]$Iso,
+    [string]$IsoChecksum,
     [string]$ToolsIso
 )
 
@@ -104,6 +107,16 @@ if ($SetupMode) {
     Write-Host "Setup Mode: $SetupMode"
 }
 
+if ($Name) {
+    $PackerArgs += "-var", "vm_name=$Name"
+    Write-Host "VM Name: $Name"
+}
+
+if ($NetDevice) {
+    $PackerArgs += "-var", "net_device=$NetDevice"
+    Write-Host "Net Device: $NetDevice"
+}
+
 if ($Cpu) {
     $PackerArgs += "-var", "cpus=$Cpu"
     Write-Host "Overrides CPU: $Cpu"
@@ -141,6 +154,13 @@ if ($Iso) {
     Write-Host "Using OS ISO: $ResolvedIso"
     # Note: Packer handles file:/// properly if formatted correctly, or just the absolute path
     $PackerArgs += "-var", "iso_url=file:///$ResolvedIso"
+    if (-not $IsoChecksum) {
+        $IsoChecksum = "none"
+    }
+}
+
+if ($IsoChecksum) {
+    $PackerArgs += "-var", "iso_checksum=$IsoChecksum"
 }
 
 if ($ToolsIso) {
@@ -163,9 +183,11 @@ if (-not $PkrFiles) {
 
 Push-Location $VirtDir
 
+Write-Host "Initializing Packer plugins..."
+packer init .
+
 Write-Host "Running: packer build $PackerArgs ."
-# Uncomment to execute
-# packer build $PackerArgs .
+packer build $PackerArgs .
 
 Pop-Location
 
