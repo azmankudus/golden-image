@@ -26,3 +26,10 @@
 !/*/*.pkr.hcl
 !/*/res/
 !/*/res/*
+!/golden-image.sh
+!/golden-image.ps1
+!/.agent
+!/schema/
+!/schema/*
+!/os/
+!/os/**

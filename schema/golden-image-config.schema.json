@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Golden Image Configuration",
+  "type": "object",
+  "properties": {
+    "os": { "type": "string" },
+    "description": { "type": "string" },
+    "iso_url": { "type": "string" },
+    "iso_checksum": { "type": "string" },
+    "default_cpu": { "type": "integer", "minimum": 1 },
+    "default_memory": { "type": "integer", "minimum": 512 },
+    "disks": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "name": { "type": "string" },
+          "size_mb": { "type": "integer", "minimum": 1024 },
+          "controller": { "type": "string" }
+        },
+        "required": ["name", "size_mb"]
+      }
+    },
+    "modes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "properties": {
+          "scripts": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  },
+  "required": ["os", "default_cpu", "default_memory", "disks"]
+}
