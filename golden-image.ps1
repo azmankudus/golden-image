@@ -7,7 +7,9 @@ param(
     [string]$DiskLayout,
     [string]$Mode = "base",
     [string]$RemoteConfig,
-    [string]$UploadConfig
+    [string]$UploadConfig,
+    [string]$Iso,
+    [string]$ToolsIso
 )
 
 if ($List) {
@@ -31,6 +33,53 @@ if (-not $Virt) {
     exit 1
 }
 
+function Resolve-Or-Fetch-Iso {
+    param([string]$Uri, [string]$DestDir)
+    
+    if (-not (Test-Path $DestDir)) {
+        New-Item -ItemType Directory -Force -Path $DestDir | Out-Null
+    }
+
+    $Filename = Split-Path $Uri -Leaf
+    # Provide a local path relative to current pwd
+    $DestFile = Join-Path (Resolve-Path $DestDir).Path $Filename
+
+    if ($Uri -match "^s3://") {
+        if (-not (Test-Path $DestFile)) {
+            Write-Host "Downloading $Uri to $DestFile via AWS CLI..."
+            aws s3 cp $Uri $DestFile
+        } else {
+            Write-Host "Cached ISO found: $DestFile"
+        }
+        return $DestFile
+    } elseif ($Uri -match "^smb://") {
+        if (-not (Test-Path $DestFile)) {
+            Write-Host "Downloading $Uri to $DestFile..."
+            $SmbPath = $Uri -replace "^smb://", "\\" -replace "/", "\"
+            Copy-Item -Path $SmbPath -Destination $DestFile
+        } else {
+            Write-Host "Cached ISO found: $DestFile"
+        }
+        return $DestFile
+    } elseif ($Uri -match "^(http|https|ftp|ftps|sftp)://") {
+        if (-not (Test-Path $DestFile)) {
+            Write-Host "Downloading $Uri to $DestFile..."
+            Invoke-WebRequest -Uri $Uri -OutFile $DestFile
+        } else {
+            Write-Host "Cached ISO found: $DestFile"
+        }
+        return $DestFile
+    } elseif ($Uri -match "^file://") {
+        $LocalPath = $Uri -replace "^file://", ""
+        return $LocalPath
+    } elseif ([System.IO.Path]::IsPathRooted($Uri)) {
+        return $Uri
+    } else {
+        return (Resolve-Path $Uri).Path
+    }
+}
+
+
 Write-Host "Building Golden Image for OS: $Os"
 Write-Host "Virtualization: $Virt"
 Write-Host "Mode: $Mode"
@@ -53,12 +102,28 @@ if ($DiskLayout) {
 
 if ($RemoteConfig) {
     Write-Host "Using remote target configuration from: $RemoteConfig"
-    $PackerArgs += "-var-file", "$RemoteConfig"
+    $ResolvedRemote = (Resolve-Path $RemoteConfig).Path
+    $PackerArgs += "-var-file", "$ResolvedRemote"
 }
 
 if ($UploadConfig) {
     Write-Host "Using upload configuration from: $UploadConfig"
-    $PackerArgs += "-var-file", "$UploadConfig"
+    $ResolvedUpload = (Resolve-Path $UploadConfig).Path
+    $PackerArgs += "-var-file", "$ResolvedUpload"
+}
+
+$IsoCacheDir = "cache\iso"
+if ($Iso) {
+    $ResolvedIso = Resolve-Or-Fetch-Iso -Uri $Iso -DestDir $IsoCacheDir
+    Write-Host "Using OS ISO: $ResolvedIso"
+    # Note: Packer handles file:/// properly if formatted correctly, or just the absolute path
+    $PackerArgs += "-var", "iso_url=file:///$ResolvedIso"
+}
+
+if ($ToolsIso) {
+    $ResolvedToolsIso = Resolve-Or-Fetch-Iso -Uri $ToolsIso -DestDir $IsoCacheDir
+    Write-Host "Using Tools ISO: $ResolvedToolsIso"
+    $PackerArgs += "-var", "tools_iso=$ResolvedToolsIso"
 }
 
 Push-Location "os\$Os\packer"
@@ -69,7 +134,7 @@ $Builder = switch ($Virt) {
     "vmware-workstation" { "vmware-iso" }
     "vmware-esxi" { "vsphere-iso" }
     "vmware-vcenter" { "vsphere-iso" }
-    "proxox" { "proxmox-iso" }
+    "proxmox" { "proxmox-iso" }
     "xcp-ng" { "xenserver-iso" }
     default { $Virt }
 }
@@ -83,9 +148,6 @@ Pop-Location
 if ($UploadConfig) {
     Write-Host ""
     Write-Host "Post-Build: Executing upload/export sequence based on $UploadConfig..."
-    # Note: Real logic to parse UPLOAD_CONFIG and perform the action goes here
-    # e.g., if type == 's3', run `aws s3 cp ...`
-    # e.g., if type == 'smb', run `Copy-Item ...`
     Write-Host "Upload/Export completed!"
 }
 

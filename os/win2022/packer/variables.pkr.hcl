@@ -18,6 +18,10 @@ variable "iso_checksum" {
   type    = string
   default = "sha256:4f1457c4fe14ce48c9b2324924f33ca4f0470475e661bb16d0033abaf2ebde1e"
 }
+variable "tools_iso" {
+  type    = string
+  default = ""
+}
 variable "headless" {
   type    = bool
   default = true

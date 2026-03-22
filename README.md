@@ -82,6 +82,18 @@ To connect to remote platforms like vSphere or Proxmox, provide a JSON/YAML conf
 ### Upload & Export Destinations
 To automate the distribution of the final image, provide a JSON/YAML configuration file using `--upload-config`. This file must conform to `schema/upload-config.schema.json` and supports local copying, S3, SMB, and Vagrant Cloud.
 
+### Override ISO & Tools ISO
+You can optionally provide dynamic ISOs to override the default OS template ISO or inject an additional Tools ISO (like VMware Tools or VirtualBox Guest Additions).
+The scripts support retrieving ISOs from `http/https`, `ftp/sftp`, `s3://`, `smb://`, `file://`, absolute, or relative paths natively:
+
+```bash
+# Override the base OS ISO with an S3 bucket source
+./golden-image.sh --os win2022 --virt libvirt --iso "s3://my-iso-bucket/windows-2022-custom.iso"
+
+# Inject an additional tools ISO from a local network SMB share
+./golden-image.sh --os win2022 --virt vmware-workstation --tools-iso "smb://nas.local/isos/vmware-tools.iso"
+```
+
 ---
 
 ## 🤖 Agentic Use

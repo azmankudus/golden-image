@@ -5,8 +5,9 @@
   "properties": {
     "os": { "type": "string" },
     "description": { "type": "string" },
-    "iso_url": { "type": "string" },
+    "iso_url": { "type": "string", "description": "URL or path to the OS ISO" },
     "iso_checksum": { "type": "string" },
+    "tools_iso": { "type": "string", "description": "Optional path or URL to an additional tools ISO" },
     "default_cpu": { "type": "integer", "minimum": 1 },
     "default_memory": { "type": "integer", "minimum": 512 },
     "disks": {

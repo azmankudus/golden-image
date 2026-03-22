@@ -17,6 +17,8 @@ usage() {
     echo "  --mode <type>          Mode to run: base, hardened, vagrant"
     echo "  --remote-config <file> Specify JSON/YAML file for remote target configuration (e.g., vCenter, Proxmox)"
     echo "  --upload-config <file> Specify JSON/YAML file for upload destination (e.g., local, S3, SMB)"
+    echo "  --iso <uri>            Override OS ISO (supports http/s, ftp, sftp, s3, smb, file://, relative, absolute)"
+    echo "  --tools-iso <uri>      Specify tools ISO (supports http/s, ftp, sftp, s3, smb, file://, relative, absolute)"
     echo "  --help                 Show this help message"
     exit 1
 }
@@ -34,6 +36,8 @@ DISK_LAYOUT=""
 MODE="base"
 REMOTE_CONFIG=""
 UPLOAD_CONFIG=""
+ISO=""
+TOOLS_ISO=""
 
 while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -46,6 +50,8 @@ while [[ $# -gt 0 ]]; do
         --mode) MODE="$2"; shift 2 ;;
         --remote-config) REMOTE_CONFIG="$2"; shift 2 ;;
         --upload-config) UPLOAD_CONFIG="$2"; shift 2 ;;
+        --iso) ISO="$2"; shift 2 ;;
+        --tools-iso) TOOLS_ISO="$2"; shift 2 ;;
         --help|-h) usage ;;
         *) echo "Unknown option: $1"; usage ;;
     esac
@@ -72,6 +78,38 @@ if [[ -z "$VIRT" ]]; then
     usage
 fi
 
+# Helper function to resolve or download ISOs
+resolve_or_fetch_iso() {
+    local uri=$1
+    local dest_dir=$2
+    local filename=$(basename "$uri")
+    
+    mkdir -p "$dest_dir"
+
+    if [[ "$uri" == s3://* || "$uri" == smb://* || "$uri" == http://* || "$uri" == https://* || "$uri" == ftp://* || "$uri" == ftps://* || "$uri" == sftp://* ]]; then
+        local dest_file="$dest_dir/$filename"
+        if [[ ! -f "$dest_file" ]]; then
+            echo "Downloading $uri to $dest_file..."
+            if [[ "$uri" == s3://* ]]; then
+                aws s3 cp "$uri" "$dest_file"
+            elif [[ "$uri" == smb://* ]]; then
+                smbget -q -o "$dest_file" "$uri"
+            else
+                curl -L -o "$dest_file" "$uri"
+            fi
+        else
+            echo "Cached ISO found: $dest_file"
+        fi
+        echo "$PWD/$dest_file"
+    elif [[ "$uri" == file://* ]]; then
+        echo "${uri#file://}"
+    elif [[ "$uri" = /* ]]; then
+        echo "$uri"
+    else
+        echo "$PWD/$uri"
+    fi
+}
+
 echo "Building Golden Image for OS: $OS"
 echo "Virtualization: $VIRT"
 echo "Mode: $MODE"
@@ -93,12 +131,25 @@ fi
 
 if [[ -n "$REMOTE_CONFIG" ]]; then
     echo "Using remote target configuration from: $REMOTE_CONFIG"
-    PACKER_ARGS+=("-var-file" "$REMOTE_CONFIG")
+    PACKER_ARGS+=("-var-file" "$PWD/$REMOTE_CONFIG")
 fi
 
 if [[ -n "$UPLOAD_CONFIG" ]]; then
     echo "Using upload configuration from: $UPLOAD_CONFIG"
-    PACKER_ARGS+=("-var-file" "$UPLOAD_CONFIG")
+    PACKER_ARGS+=("-var-file" "$PWD/$UPLOAD_CONFIG")
+fi
+
+ISO_CACHE_DIR="cache/iso"
+if [[ -n "$ISO" ]]; then
+    RESOLVED_ISO=$(resolve_or_fetch_iso "$ISO" "$ISO_CACHE_DIR")
+    echo "Using OS ISO: $RESOLVED_ISO"
+    PACKER_ARGS+=("-var" "iso_url=file://$RESOLVED_ISO")
+fi
+
+if [[ -n "$TOOLS_ISO" ]]; then
+    RESOLVED_TOOLS_ISO=$(resolve_or_fetch_iso "$TOOLS_ISO" "$ISO_CACHE_DIR")
+    echo "Using Tools ISO: $RESOLVED_TOOLS_ISO"
+    PACKER_ARGS+=("-var" "tools_iso=$RESOLVED_TOOLS_ISO")
 fi
 
 cd "os/$OS/packer"
@@ -122,8 +173,6 @@ if [[ -n "$UPLOAD_CONFIG" ]]; then
     echo ""
     echo "Post-Build: Executing upload/export sequence based on $UPLOAD_CONFIG..."
     # Note: Real logic to parse UPLOAD_CONFIG and perform the action goes here
-    # e.g., if type == 's3', run `aws s3 cp ...`
-    # e.g., if type == 'smb', run `smbclient ...`
     echo "Upload/Export completed!"
 fi
 
