@@ -1,4 +1,4 @@
-# Windows Server Unattended Setup Guardrails
+# Windows Server Unattended Setup Rules
 
 When an agent interacts with Windows Server Packer configurations, the following strict boundaries MUST be observed to prevent broken zero-touch builds.
 
@@ -19,3 +19,4 @@ When an agent interacts with Windows Server Packer configurations, the following
 
 ## 5. Product Key Bypass
 - **ALWAYS** ensure `autounattend.xml` contains a `UserData > ProductKey` node using a generic KMS setup key (e.g., `VDYBN-27WPP-V4HQT-9VMD4-VMK7H`) accompanied by `<WillShowUI>OnError</WillShowUI>`. If this is omitted, the installation will permanently pause on the Language Selection screen.
+- **ALWAYS** ensure `OSImage > InstallTo` contains `<WillShowUI>OnError</WillShowUI>`.
