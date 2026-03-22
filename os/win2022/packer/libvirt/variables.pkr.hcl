@@ -38,6 +38,10 @@ variable "net_device" {
   type    = string
   default = "virtio-net"
 }
+variable "ssh_password" {
+  type    = string
+  default = "A1b2#C3d4$"
+}
 variable "headless" {
   type    = bool
   default = true

@@ -18,7 +18,7 @@ source "virtualbox-iso" "win2022" {
   guest_os_type    = "Windows2022_64"
   http_directory   = "../../"
   ssh_username     = "Administrator"
-  ssh_password     = "Vagrant1!"
+  ssh_password     = var.ssh_password
   ssh_timeout      = "1h"
   vm_name          = var.vm_name
   cpus             = var.cpus
