@@ -10,7 +10,7 @@ packer {
 source "qemu" "win2022" {
   iso_url          = var.iso_url
   iso_checksum     = var.iso_checksum
-  output_directory = "output-qemu-win2022"
+  output_directory = var.output_dir
   shutdown_command = "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\""
   disk_size        = var.disk_size
   format           = "qcow2"

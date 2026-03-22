@@ -10,7 +10,7 @@ packer {
 source "virtualbox-iso" "win2022" {
   iso_url          = var.iso_url
   iso_checksum     = var.iso_checksum
-  output_directory = "output-virtualbox-win2022"
+  output_directory = var.output_dir
   shutdown_command = "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\""
   disk_size        = var.disk_size
   guest_os_type    = "Windows2022_64"

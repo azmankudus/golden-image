@@ -4,8 +4,10 @@ param(
     [string]$Virt,
     [int]$Cpu,
     [int]$Memory,
+    [int]$DiskSize,
     [string]$DiskLayout,
     [string]$Mode = "base",
+    [string]$SetupMode,
     [string]$RemoteConfig,
     [string]$UploadConfig,
     [string]$Iso,
@@ -84,7 +86,23 @@ Write-Host "Building Golden Image for OS: $Os"
 Write-Host "Virtualization: $Virt"
 Write-Host "Mode: $Mode"
 
+if (-not (Test-Path "output")) {
+    if (Test-Path "/work/golden-image") {
+        New-Item -ItemType Directory -Force -Path "/work/golden-image/output" | Out-Null
+        New-Item -ItemType SymbolicLink -Path "output" -Target "/work/golden-image/output" | Out-Null
+    } else {
+        New-Item -ItemType Directory -Force -Path "output" | Out-Null
+    }
+}
+$OutputDir = (Resolve-Path "output").Path + "\$Os-$Virt"
+
 $PackerArgs = @()
+$PackerArgs += "-var", "output_dir=$OutputDir"
+
+if ($SetupMode) {
+    $PackerArgs += "-var", "setup_mode=$SetupMode"
+    Write-Host "Setup Mode: $SetupMode"
+}
 
 if ($Cpu) {
     $PackerArgs += "-var", "cpus=$Cpu"
@@ -94,6 +112,11 @@ if ($Cpu) {
 if ($Memory) {
     $PackerArgs += "-var", "memory=$Memory"
     Write-Host "Overrides Memory: $Memory"
+}
+
+if ($DiskSize) {
+    $PackerArgs += "-var", "disk_size=$DiskSize"
+    Write-Host "Overrides Disk Size: $DiskSize"
 }
 
 if ($DiskLayout) {

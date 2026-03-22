@@ -50,6 +50,13 @@ Welcome to the **Golden Image Builder**! This project provides a universal, scal
 # Build a Windows Server 2022 Base Image on Libvirt
 ./golden-image.sh --os win2022 --virt libvirt --mode base
 
+# Create Windows Server 2022 Base Image with specific setup mode, ISOs, and custom hardware
+./golden-image.sh --os win2022 --virt libvirt --mode base \
+  --cpu 1 --memory 1024 --disk-size 204800 \
+  --setup-mode "server core" \
+  --iso "file:///work/iso/en-us_windows_server_2022_updated_feb_2026_x64_dvd_09efea0d.iso" \
+  --tools-iso "file:///work/iso/virtio-win-0.1.285.iso"
+
 # Build on a remote vCenter using a custom target config
 ./golden-image.sh --os win2022 --virt vmware-vcenter --remote-config my-vcenter.json
 

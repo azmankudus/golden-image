@@ -22,6 +22,14 @@ variable "tools_iso" {
   type    = string
   default = ""
 }
+variable "output_dir" {
+  type    = string
+  default = "../../../../output/win2022-virtualbox"
+}
+variable "setup_mode" {
+  type    = string
+  default = "standard"
+}
 variable "headless" {
   type    = bool
   default = true

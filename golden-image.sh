@@ -13,8 +13,10 @@ usage() {
     echo "                           Remote: vmware-esxi, vmware-vcenter, proxmox, xcp-ng"
     echo "  --cpu <cores>          Number of CPUs (overrides default)"
     echo "  --memory <mb>          Memory size in MB (overrides default)"
+    echo "  --disk-size <mb>       Main disk size in MB (overrides default)"
     echo "  --disk-layout <file>   Specify separate YAML file for disk layout (overrides default config.yml)"
     echo "  --mode <type>          Mode to run: base, hardened, vagrant"
+    echo "  --setup-mode <type>    Setup mode (e.g., server, core, desktop, workstation)"
     echo "  --remote-config <file> Specify JSON/YAML file for remote target configuration (e.g., vCenter, Proxmox)"
     echo "  --upload-config <file> Specify JSON/YAML file for upload destination (e.g., local, S3, SMB)"
     echo "  --iso <uri>            Override OS ISO (supports http/s, ftp, sftp, s3, smb, file://, relative, absolute)"
@@ -32,8 +34,10 @@ OS=""
 VIRT=""
 CPU=""
 MEMORY=""
+DISK_SIZE=""
 DISK_LAYOUT=""
 MODE="base"
+SETUP_MODE=""
 REMOTE_CONFIG=""
 UPLOAD_CONFIG=""
 ISO=""
@@ -46,8 +50,10 @@ while [[ $# -gt 0 ]]; do
         --virt) VIRT="$2"; shift 2 ;;
         --cpu) CPU="$2"; shift 2 ;;
         --memory) MEMORY="$2"; shift 2 ;;
+        --disk-size) DISK_SIZE="$2"; shift 2 ;;
         --disk-layout) DISK_LAYOUT="$2"; shift 2 ;;
         --mode) MODE="$2"; shift 2 ;;
+        --setup-mode) SETUP_MODE="$2"; shift 2 ;;
         --remote-config) REMOTE_CONFIG="$2"; shift 2 ;;
         --upload-config) UPLOAD_CONFIG="$2"; shift 2 ;;
         --iso) ISO="$2"; shift 2 ;;
@@ -114,7 +120,25 @@ echo "Building Golden Image for OS: $OS"
 echo "Virtualization: $VIRT"
 echo "Mode: $MODE"
 
+# Auto-create output folder structure
+if [[ ! -d "output" ]]; then
+    if [[ -d "/work/golden-image" ]]; then
+        mkdir -p /work/golden-image/output
+        ln -s /work/golden-image/output output
+    else
+        mkdir -p output
+    fi
+fi
+OUTPUT_DIR="$PWD/output/$OS-$VIRT"
+
 PACKER_ARGS=()
+PACKER_ARGS+=("-var" "output_dir=$OUTPUT_DIR")
+
+if [[ -n "$SETUP_MODE" ]]; then
+    PACKER_ARGS+=("-var" "setup_mode=$SETUP_MODE")
+    echo "Setup Mode: $SETUP_MODE"
+fi
+
 if [[ -n "$CPU" ]]; then
     PACKER_ARGS+=("-var" "cpus=$CPU")
     echo "Overrides CPU: $CPU"
@@ -123,6 +147,11 @@ fi
 if [[ -n "$MEMORY" ]]; then
     PACKER_ARGS+=("-var" "memory=$MEMORY")
     echo "Overrides Memory: $MEMORY"
+fi
+
+if [[ -n "$DISK_SIZE" ]]; then
+    PACKER_ARGS+=("-var" "disk_size=$DISK_SIZE")
+    echo "Overrides Disk Size: $DISK_SIZE"
 fi
 
 if [[ -n "$DISK_LAYOUT" ]]; then
