@@ -57,6 +57,7 @@
             </ImageInstall>
             <UserData>
                 <ProductKey>
+                    <!-- KMS Client Setup Key for Windows Server 2022 Standard -->
                     <Key>VDYBN-27WPP-V4HQT-9VMD4-VMK7H</Key>
                     <WillShowUI>OnError</WillShowUI>
                 </ProductKey>
