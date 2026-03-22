@@ -36,3 +36,5 @@
 !/config/**
 !/os/
 !/os/**
+!/logs/
+!/logs/**

@@ -183,18 +183,33 @@ if (-not $PkrFiles) {
 
 Push-Location $VirtDir
 
-Write-Host "Initializing Packer plugins..."
-packer init .
-
-Write-Host "Running: packer build $PackerArgs ."
-packer build $PackerArgs .
-
-Pop-Location
-
-if ($UploadConfig) {
-    Write-Host ""
-    Write-Host "Post-Build: Executing upload/export sequence based on $UploadConfig..."
-    Write-Host "Upload/Export completed!"
+# Set up logging
+$Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
+$ImageName = if ($Name) { $Name } else { "$Os-$Virt" }
+$LogDir = (Resolve-Path "..\..\..\..").Path + "\logs"
+if (-not (Test-Path $LogDir)) {
+    New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 }
+$LogFile = "$LogDir\$Timestamp-$ImageName.log"
 
-Write-Host "Done!"
+Write-Host "Logging output to: $LogFile"
+Start-Transcript -Path $LogFile -Append -NoClobber | Out-Null
+
+try {
+    Write-Host "Initializing Packer plugins..."
+    packer init .
+
+    Write-Host "Running: packer build $PackerArgs ."
+    packer build $PackerArgs .
+
+    if ($UploadConfig) {
+        Write-Host ""
+        Write-Host "Post-Build: Executing upload/export sequence based on $UploadConfig..."
+        Write-Host "Upload/Export completed!"
+    }
+
+    Write-Host "Done!"
+} finally {
+    Stop-Transcript | Out-Null
+    Pop-Location
+}

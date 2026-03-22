@@ -220,17 +220,28 @@ fi
 
 cd "$VIRT_DIR"
 
-echo "Initializing Packer plugins..."
-packer init .
+# Set up logging
+TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
+IMAGE_NAME=${VM_NAME:-"$OS-$VIRT"}
+LOG_FILE="$PWD/../../../../logs/${TIMESTAMP}-${IMAGE_NAME}.log"
+mkdir -p "$PWD/../../../../logs"
 
-echo "Running: packer build ${PACKER_ARGS[@]} ."
-packer build "${PACKER_ARGS[@]}" .
+echo "Logging output to: $LOG_FILE"
 
-if [[ -n "$UPLOAD_CONFIG" ]]; then
-    echo ""
-    echo "Post-Build: Executing upload/export sequence based on $UPLOAD_CONFIG..."
-    # Note: Real logic to parse UPLOAD_CONFIG and perform the action goes here
-    echo "Upload/Export completed!"
-fi
+# Run everything through tee to capture logs
+{
+    echo "Initializing Packer plugins..."
+    packer init .
 
-echo "Done!"
+    echo "Running: packer build ${PACKER_ARGS[@]} ."
+    packer build "${PACKER_ARGS[@]}" .
+
+    if [[ -n "$UPLOAD_CONFIG" ]]; then
+        echo ""
+        echo "Post-Build: Executing upload/export sequence based on $UPLOAD_CONFIG..."
+        # Note: Real logic to parse UPLOAD_CONFIG and perform the action goes here
+        echo "Upload/Export completed!"
+    fi
+
+    echo "Done!"
+} 2>&1 | tee "$LOG_FILE"
