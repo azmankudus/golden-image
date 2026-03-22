@@ -1,0 +1,34 @@
+name: build-os-template
+description: Scaffold a new OS template architecture for the Golden Image builder.
+
+parameters:
+  - name: os_name
+    description: The internal short name of the OS (e.g., ubuntu2404, rhel9)
+    required: true
+  - name: iso_url
+    description: The default URL to download the ISO
+    required: true
+
+steps:
+  - execute: |
+      mkdir -p os/{{os_name}}/{packer/{libvirt,virtualbox,vmware-workstation,vmware-esxi,vmware-vcenter,proxmox,xcp-ng,hyperv},scripts,unattended}
+  - write:
+      path: os/{{os_name}}/config.yml
+      content: |
+        os: {{os_name}}
+        description: Base template
+        iso_url: "{{iso_url}}"
+        default_cpu: 2
+        default_memory: 4096
+        disks:
+          - name: os
+            size_mb: 51200
+            controller: scsi
+        modes:
+          base:
+            scripts:
+              - setup.sh
+  - execute: |
+      touch os/{{os_name}}/scripts/setup.sh
+      chmod +x os/{{os_name}}/scripts/setup.sh
+      touch os/{{os_name}}/unattended/user-data

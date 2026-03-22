@@ -1,0 +1,12 @@
+name: troubleshoot-build
+description: Standard operating procedure for troubleshooting failed Packer builds.
+
+triggers:
+  - log_contains: "Waiting for SSH to become available"
+  - log_contains: "Error:"
+
+steps:
+  1. Kill all headless background processes (`pkill -f qemu-system-x86_64`, `pkill -f packer`).
+  2. Wipe the output directory to prevent state corruption (`rm -rf output/<os>-<virt>`).
+  3. Validate Packer syntax (`packer validate .`).
+  4. Relaunch the build wrapper script explicitly injecting the `--gui` flag so the graphical output can be monitored locally for visual errors.
