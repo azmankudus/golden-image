@@ -24,8 +24,8 @@ source "qemu" "win2022" {
   vm_name          = var.vm_name
   net_device       = var.net_device
   disk_interface   = "virtio"
-  boot_wait        = "3s"
-  boot_command     = ["<enter><wait><enter>"]
+  boot_wait        = "2s"
+  boot_command     = ["<enter><wait><enter><wait><enter><wait><enter><wait><enter>"]
   cpus             = var.cpus
   memory           = var.memory
   headless         = var.headless

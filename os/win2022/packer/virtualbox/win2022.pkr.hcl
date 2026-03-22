@@ -24,8 +24,8 @@ source "virtualbox-iso" "win2022" {
   cpus             = var.cpus
   memory           = var.memory
   headless         = var.headless
-  boot_wait        = "3s"
-  boot_command     = ["<enter><wait><enter>"]
+  boot_wait        = "2s"
+  boot_command     = ["<enter><wait><enter><wait><enter><wait><enter><wait><enter>"]
   floppy_files     = ["../../unattended/autounattend.xml"]
 }
 
