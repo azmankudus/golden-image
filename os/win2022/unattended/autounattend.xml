@@ -4,6 +4,7 @@
         <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
             <SetupUILanguage>
                 <UILanguage>en-US</UILanguage>
+                <WillShowUI>OnError</WillShowUI>
             </SetupUILanguage>
             <InputLocale>en-US</InputLocale>
             <SystemLocale>en-US</SystemLocale>
