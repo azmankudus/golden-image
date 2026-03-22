@@ -2,6 +2,12 @@
 <unattend xmlns="urn:schemas-microsoft-com:unattend">
     <settings pass="windowsPE">
         <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <RunSynchronous>
+                <RunSynchronousCommand wcm:action="add">
+                    <Order>1</Order>
+                    <Path>cmd.exe /c "FOR %i IN (C D E F G H I) DO IF EXIST %i:\viostor\2k22\amd64\viostor.inf (drvload %i:\viostor\2k22\amd64\viostor.inf &amp; drvload %i:\NetKVM\2k22\amd64\netkvm.inf &amp; drvload %i:\vioscsi\2k22\amd64\vioscsi.inf)"</Path>
+                </RunSynchronousCommand>
+            </RunSynchronous>
             <UserData>
                 <AcceptEula>true</AcceptEula>
                 <ProductKey>
