@@ -39,6 +39,7 @@
                         </ModifyPartition>
                     </ModifyPartitions>
                 </Disk>
+                <WillShowUI>OnError</WillShowUI>
             </DiskConfiguration>
             <ImageInstall>
                 <OSImage>
