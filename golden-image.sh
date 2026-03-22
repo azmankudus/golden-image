@@ -152,22 +152,22 @@ if [[ -n "$TOOLS_ISO" ]]; then
     PACKER_ARGS+=("-var" "tools_iso=$RESOLVED_TOOLS_ISO")
 fi
 
-cd "os/$OS/packer"
+VIRT_DIR="os/$OS/packer/$VIRT"
+if [[ ! -d "$VIRT_DIR" ]]; then
+    echo "Error: Virtualization platform '$VIRT' is not implemented for OS '$OS'."
+    exit 1
+fi
 
-case "$VIRT" in
-    libvirt) BUILDER="qemu" ;;
-    virtualbox) BUILDER="virtualbox-iso" ;;
-    vmware-workstation) BUILDER="vmware-iso" ;;
-    vmware-esxi) BUILDER="vsphere-iso" ;;
-    vmware-vcenter) BUILDER="vsphere-iso" ;;
-    proxmox) BUILDER="proxmox-iso" ;;
-    xcp-ng) BUILDER="xenserver-iso" ;;
-    *) BUILDER="$VIRT" ;;
-esac
+if ! ls "$VIRT_DIR"/*.pkr.hcl 1> /dev/null 2>&1; then
+    echo "Error: No Packer templates found in $VIRT_DIR"
+    exit 1
+fi
 
-echo "Running: packer build -only=*.$BUILDER.* ${PACKER_ARGS[@]} ."
+cd "$VIRT_DIR"
+
+echo "Running: packer build ${PACKER_ARGS[@]} ."
 # Uncomment to execute
-# packer build -only="*.$BUILDER.*" "${PACKER_ARGS[@]}" .
+# packer build "${PACKER_ARGS[@]}" .
 
 if [[ -n "$UPLOAD_CONFIG" ]]; then
     echo ""

@@ -126,22 +126,23 @@ if ($ToolsIso) {
     $PackerArgs += "-var", "tools_iso=$ResolvedToolsIso"
 }
 
-Push-Location "os\$Os\packer"
-
-$Builder = switch ($Virt) {
-    "libvirt" { "qemu" }
-    "virtualbox" { "virtualbox-iso" }
-    "vmware-workstation" { "vmware-iso" }
-    "vmware-esxi" { "vsphere-iso" }
-    "vmware-vcenter" { "vsphere-iso" }
-    "proxmox" { "proxmox-iso" }
-    "xcp-ng" { "xenserver-iso" }
-    default { $Virt }
+$VirtDir = "os\$Os\packer\$Virt"
+if (-not (Test-Path $VirtDir)) {
+    Write-Error "Virtualization platform '$Virt' is not implemented for OS '$Os'."
+    exit 1
 }
 
-Write-Host "Running: packer build -only=*.$Builder.* $PackerArgs ."
+$PkrFiles = Get-ChildItem -Path $VirtDir -Filter "*.pkr.hcl" -ErrorAction SilentlyContinue
+if (-not $PkrFiles) {
+    Write-Error "No Packer templates found in $VirtDir"
+    exit 1
+}
+
+Push-Location $VirtDir
+
+Write-Host "Running: packer build $PackerArgs ."
 # Uncomment to execute
-# packer build -only="*.$Builder.*" $PackerArgs .
+# packer build $PackerArgs .
 
 Pop-Location
 
