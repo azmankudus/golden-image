@@ -13,6 +13,8 @@ source "qemu" "win2022" {
   output_directory = var.output_dir
   shutdown_command = "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\""
   disk_size        = var.disk_size
+  disk_compression = false
+  disk_discard     = "unmap"
   format           = "qcow2"
   accelerator      = "kvm"
   http_directory   = "../../"

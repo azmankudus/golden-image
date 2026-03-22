@@ -13,6 +13,8 @@ source "virtualbox-iso" "win2022" {
   output_directory = var.output_dir
   shutdown_command = "shutdown /s /t 10 /f /d p:4:1 /c \"Packer Shutdown\""
   disk_size        = var.disk_size
+  hard_drive_nonrotational = true
+  hard_drive_discard = true
   guest_os_type    = "Windows2022_64"
   http_directory   = "../../"
   ssh_username     = "Administrator"
