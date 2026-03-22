@@ -1,0 +1,46 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Remote Target Configuration",
+  "type": "object",
+  "description": "Configuration for remote virtualization targets like vCenter, Proxmox, or ESXi",
+  "properties": {
+    "endpoint": {
+      "type": "string",
+      "description": "The API endpoint or IP address of the remote target"
+    },
+    "username": {
+      "type": "string",
+      "description": "Username for authentication"
+    },
+    "password": {
+      "type": "string",
+      "description": "Password or token for authentication"
+    },
+    "insecure_connection": {
+      "type": "boolean",
+      "description": "Whether to skip TLS verification",
+      "default": false
+    },
+    "datacenter": {
+      "type": "string",
+      "description": "The datacenter name (e.g., for vCenter)"
+    },
+    "cluster": {
+      "type": "string",
+      "description": "The cluster or host to deploy to"
+    },
+    "datastore": {
+      "type": "string",
+      "description": "The storage location for the VM"
+    },
+    "network": {
+      "type": "string",
+      "description": "The network switch or bridge to connect to"
+    },
+    "folder": {
+      "type": "string",
+      "description": "The VM folder to organize the deployed image"
+    }
+  },
+  "required": ["endpoint", "username", "password", "datastore"]
+}

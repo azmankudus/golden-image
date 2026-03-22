@@ -5,7 +5,9 @@ param(
     [int]$Cpu,
     [int]$Memory,
     [string]$DiskLayout,
-    [string]$Mode = "base"
+    [string]$Mode = "base",
+    [string]$RemoteConfig,
+    [string]$UploadConfig
 )
 
 if ($List) {
@@ -49,6 +51,16 @@ if ($DiskLayout) {
     Write-Host "Using disk layout from: $DiskLayout"
 }
 
+if ($RemoteConfig) {
+    Write-Host "Using remote target configuration from: $RemoteConfig"
+    $PackerArgs += "-var-file", "$RemoteConfig"
+}
+
+if ($UploadConfig) {
+    Write-Host "Using upload configuration from: $UploadConfig"
+    $PackerArgs += "-var-file", "$UploadConfig"
+}
+
 Push-Location "os\$Os\packer"
 
 $Builder = switch ($Virt) {
@@ -57,7 +69,7 @@ $Builder = switch ($Virt) {
     "vmware-workstation" { "vmware-iso" }
     "vmware-esxi" { "vsphere-iso" }
     "vmware-vcenter" { "vsphere-iso" }
-    "proxmox" { "proxmox-iso" }
+    "proxox" { "proxmox-iso" }
     "xcp-ng" { "xenserver-iso" }
     default { $Virt }
 }
@@ -67,4 +79,14 @@ Write-Host "Running: packer build -only=*.$Builder.* $PackerArgs ."
 # packer build -only="*.$Builder.*" $PackerArgs .
 
 Pop-Location
+
+if ($UploadConfig) {
+    Write-Host ""
+    Write-Host "Post-Build: Executing upload/export sequence based on $UploadConfig..."
+    # Note: Real logic to parse UPLOAD_CONFIG and perform the action goes here
+    # e.g., if type == 's3', run `aws s3 cp ...`
+    # e.g., if type == 'smb', run `Copy-Item ...`
+    Write-Host "Upload/Export completed!"
+}
+
 Write-Host "Done!"

@@ -1,0 +1,40 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Upload Destination Configuration",
+  "type": "object",
+  "description": "Configuration for exporting or uploading the generated image",
+  "properties": {
+    "type": {
+      "type": "string",
+      "enum": ["local", "smb", "s3", "vagrantcloud"],
+      "description": "The type of upload destination"
+    },
+    "destination": {
+      "type": "string",
+      "description": "The target path, URI, S3 bucket, or Vagrant box name"
+    },
+    "credentials": {
+      "type": "object",
+      "properties": {
+        "username": { "type": "string" },
+        "password": { "type": "string" },
+        "token": { "type": "string" },
+        "aws_access_key": { "type": "string" },
+        "aws_secret_key": { "type": "string" },
+        "aws_region": { "type": "string" }
+      },
+      "description": "Authentication details for the remote destination"
+    },
+    "compress": {
+      "type": "boolean",
+      "description": "Whether to compress the image before uploading",
+      "default": true
+    },
+    "checksum": {
+      "type": "boolean",
+      "description": "Whether to generate a checksum for the uploaded image",
+      "default": true
+    }
+  },
+  "required": ["type", "destination"]
+}
