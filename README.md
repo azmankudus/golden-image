@@ -14,7 +14,7 @@ Welcome to the **Golden Image Builder**! This project provides a universal, scal
   - `hardened`: Locked down and security compliant.
   - `vagrant`: Readily usable for developers with `vagrant` integrations.
 - **Export & Upload**: Automatically copy the resulting image to a local folder, SMB share, AWS S3 bucket, or Vagrant Cloud.
-- **Agentic Ready**: Integrated `.agent/` context directory to natively support AI/LLM workflow enhancements.
+- **Agentic Ready**: Integrated `.agents/` context directory configures autonomous AI/LLM workflow enhancements.
 
 ---
 
@@ -24,17 +24,21 @@ Welcome to the **Golden Image Builder**! This project provides a universal, scal
 .
 ├── golden-image.sh           # Main execution script (Linux/macOS)
 ├── golden-image.ps1          # Main execution script (Windows)
-├── .agent/                   # Agentic AI Context & Instructions
+├── .agents/                  # Agentic AI Context, Rules & Workflows
 ├── schema/                   # JSON schemas for configurations
 │   ├── golden-image-config.schema.json
 │   ├── remote-target-config.schema.json
 │   └── upload-config.schema.json
 └── os/                       # OS Templates Hub
-    └── win2022/              # Example Windows Server 2022 Template
-        ├── config.yml        # Default VM definition & Disk Layout
-        ├── packer/           # Packer definitions (*.pkr.hcl)
-        ├── scripts/          # Provisioning scripts (e.g., setup.ps1)
-        └── unattended/       # Answer files (e.g., autounattend.xml)
+    └── win2022/              # Windows Server 2022 Golden Image Architecture
+        ├── build.pkr.hcl            # Native QEMU / KVM Packer Build Rules
+        ├── variables.pkr.hcl        # Input Parameter Definitions
+        ├── project.auto.pkrvars.hcl # Environment-Specific Variable Overrides
+        ├── driver/                  # Uncompressed Pre-OS VirtIO Boots Drivers
+        ├── provision/               # Application-level Internal Bootstrapping
+        ├── setup/                   # WinPE OOBE Scripts and Autounattend
+        ├── update/                  # Staged .msu Cumulative Patches
+        └── extra/                   # External Tool Uploads (e.g. WAC)
 ```
 
 ---
@@ -107,7 +111,7 @@ The scripts support retrieving ISOs from `http/https`, `ftp/sftp`, `s3://`, `smb
 
 ## 🤖 Agentic Use
 
-This repository is optimized for autonomous development! The `.agent/` directory provides AI agents with the correct instructions, skills, and contexts required to maintain and expand this framework. This prevents hallucinated paths and directs the AI strictly toward using `Packer`, the predefined schemas, and the modular `os/` system.
+This repository is optimized for autonomous development! The `.agents/` directory provides AI agents with the correct instructions, skills, and contexts required to maintain and expand this framework. This prevents hallucinated paths and directs the AI strictly toward using `Packer`, the predefined schemas, and the modular `os/` system.
 
 ---
 
