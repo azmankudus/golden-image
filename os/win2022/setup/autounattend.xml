@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+================================================================================
+File: autounattend.xml
+Description: The unattended answer file automatically orchestrates the headless 
+Windows Server zero-touch installation lifecycle. This integrates strict 
+Microsoft Setup Engine rules seamlessly matching the QEMU/KVM Virtual Hardware.
+================================================================================
+-->
+<unattend xmlns="urn:schemas-microsoft-com:unattend" xmlns:wcm="http://schemas.microsoft.com/WMIConfig/2002/State" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    
+    <!-- 
+    ============================================================================
+    Phase 1: Windows PE (Pre-Installation Environment)
+    Initiates local hardware integration and partitions the QEMU Virtual Drives.
+    ============================================================================
+    -->
+    <settings pass="windowsPE">
+        <component name="Microsoft-Windows-International-Core-WinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <SetupUILanguage>
+                <UILanguage>en-US</UILanguage>
+                <WillShowUI>OnError</WillShowUI>
+            </SetupUILanguage>
+            <InputLocale>en-US</InputLocale>
+            <SystemLocale>en-US</SystemLocale>
+            <UILanguage>en-US</UILanguage>
+            <UILanguageFallback>en-US</UILanguageFallback>
+            <UserLocale>en-US</UserLocale>
+        </component>
+
+        <!-- Dynamic Boot Driver Integration: 
+             Scans floppy drive A:\ (mounted by Packer) for VirtIO Storage drivers 
+             so that Windows PE can write to the virtio qcow2 hard drive. -->
+        <component name="Microsoft-Windows-PnpCustomizationsWinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <DriverPaths>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="1">
+                    <Path>A:\</Path>
+                </PathAndCredentials>
+            </DriverPaths>
+        </component>
+
+        <!-- Target Storage Configuration (Disk 0 Wipe & Format) -->
+        <component name="Microsoft-Windows-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <DiskConfiguration>
+                <Disk wcm:action="add">
+                    <DiskID>0</DiskID>
+                    <WillWipeDisk>true</WillWipeDisk>
+                    <CreatePartitions>
+                        <CreatePartition wcm:action="add">
+                            <Order>1</Order>
+                            <Type>Primary</Type>
+                            <Extend>true</Extend>
+                        </CreatePartition>
+                    </CreatePartitions>
+                    <ModifyPartitions>
+                        <ModifyPartition wcm:action="add">
+                            <Order>1</Order>
+                            <PartitionID>1</PartitionID>
+                            <Letter>C</Letter>
+                            <Label>Windows</Label>
+                            <Format>NTFS</Format>
+                            <Active>true</Active>
+                        </ModifyPartition>
+                    </ModifyPartitions>
+                </Disk>
+                <WillShowUI>OnError</WillShowUI>
+            </DiskConfiguration>
+
+            <!-- Image Index Target: Index 1 generally maps to Server Standard (Core) -->
+            <ImageInstall>
+                <OSImage>
+                    <InstallFrom>
+                        <MetaData wcm:action="add">
+                            <Key>/IMAGE/INDEX</Key>
+                            <Value>1</Value>
+                        </MetaData>
+                    </InstallFrom>
+                    <InstallTo>
+                        <DiskID>0</DiskID>
+                        <PartitionID>1</PartitionID>
+                    </InstallTo>
+                    <WillShowUI>OnError</WillShowUI>
+                </OSImage>
+            </ImageInstall>
+
+            <!-- Product Key Bypass 
+                 Deploying a generic KMS key prevents the initial setup from indefinitely
+                 pausing during the OS Selection Dialog. -->
+            <UserData>
+                <ProductKey>
+                    <Key>VDYBN-27WPP-V4HQT-9VMD4-VMK7H</Key>
+                    <WillShowUI>OnError</WillShowUI>
+                </ProductKey>
+                <AcceptEula>true</AcceptEula>
+                <FullName>Administrator</FullName>
+                <Organization>Organization</Organization>
+            </UserData>
+        </component>
+    </settings>
+    
+    <!-- 
+    ============================================================================
+    Phase 2: Offline Servicing Framework
+    Copies non-critical deployment drivers (e.g. virtio-net) into the core OS.
+    ============================================================================
+    -->
+    <settings pass="offlineServicing">
+        <component name="Microsoft-Windows-PnpCustomizationsNonWinPE" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <DriverPaths>
+                <PathAndCredentials wcm:action="add" wcm:keyValue="1">
+                    <Path>A:\</Path>
+                </PathAndCredentials>
+            </DriverPaths>
+        </component>
+    </settings>
+
+    <!-- 
+    ============================================================================
+    Phase 3: Specialize (Hardware Configuration Match)
+    Defines system identity, telemetry bypasses, and hostname properties.
+    ============================================================================
+    -->
+    <settings pass="specialize">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <OEMInformation>
+                <HelpCustomized>false</HelpCustomized>
+            </OEMInformation>
+            <ComputerName>win2022</ComputerName>
+            <TimeZone>Asia/Kuala_Lumpur</TimeZone>
+            <RegisteredOwner/>
+        </component>
+
+        <!-- Disable the invasive post-boot Server Manager UI -->
+        <component name="Microsoft-Windows-ServerManager-SvrMgrNc" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <DoNotOpenServerManagerAtLogon>true</DoNotOpenServerManagerAtLogon>
+        </component>
+
+        <!-- Suppress Internet Explorer Enhanced Security Configuration prompts -->
+        <component name="Microsoft-Windows-IE-ESC" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <IEHardenAdmin>false</IEHardenAdmin>
+            <IEHardenUser>false</IEHardenUser>
+        </component>
+
+        <component name="Microsoft-Windows-OutOfBoxExperience" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <DoNotOpenInitialConfigurationTasksAtLogon>true</DoNotOpenInitialConfigurationTasksAtLogon>
+        </component>
+
+        <component name="Microsoft-Windows-Security-SPP-UX" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            <SkipAutoActivation>true</SkipAutoActivation>
+        </component>
+    </settings>
+
+    <!-- 
+    ============================================================================
+    Phase 4: oobeSystem (Out-of-Box Experience / User Land)
+    Deals with creating administrative profiles and launching golden image apps.
+    ============================================================================
+    -->
+    <settings pass="oobeSystem">
+        <component name="Microsoft-Windows-Shell-Setup" processorArchitecture="amd64" publicKeyToken="31bf3856ad364e35" language="neutral" versionScope="nonSxS">
+            
+            <!-- Automate the initial Administrator logon to fire FirstLogonCommands -->
+            <AutoLogon>
+                <Password>
+                    <Value>A1b2#C3d4$</Value>
+                    <PlainText>true</PlainText>
+                </Password>
+                <Enabled>true</Enabled>
+                <Username>Administrator</Username>
+            </AutoLogon>
+
+            <!-- Execution Pipeline: Setup.ps1 configures WinRM for Packer -->
+            <FirstLogonCommands>
+                <SynchronousCommand wcm:action="add">
+                    <Order>1</Order>
+                    <!-- Executes the bootstrapping script mounted at A:\ -->
+                    <CommandLine>cmd.exe /c powershell -ExecutionPolicy Bypass -File a:\setup.ps1</CommandLine>
+                    <Description>Run Setup Script</Description>
+                    <!-- MUST BE FALSE: If true, installation blocks indefinitely waiting for user -->
+                    <RequiresUserInput>false</RequiresUserInput>
+                </SynchronousCommand>
+            </FirstLogonCommands>
+
+            <!-- Disables privacy toggles and prompts to ensure full silence -->
+            <OOBE>
+                <HideEULAPage>true</HideEULAPage>
+                <HideLocalAccountScreen>true</HideLocalAccountScreen>
+                <HideOEMRegistrationScreen>true</HideOEMRegistrationScreen>
+                <HideOnlineAccountScreens>true</HideOnlineAccountScreens>
+                <HideWirelessSetupInOOBE>true</HideWirelessSetupInOOBE>
+                <ProtectYourPC>1</ProtectYourPC>
+            </OOBE>
+
+            <!-- Global administrative credential sync -->
+            <UserAccounts>
+                <AdministratorPassword>
+                    <Value>A1b2#C3d4$</Value>
+                    <PlainText>true</PlainText>
+                </AdministratorPassword>
+            </UserAccounts>
+        </component>
+    </settings>
+</unattend>
