@@ -4,52 +4,51 @@
 # used within the build.pkr.hcl configuration for validation.
 # ==============================================================================
 
+variable "vm_name" {
+  type        = string
+  description = "Name of the VM to be created."
+  default     = "vm.qcow2"
+}
+
 variable "setup_iso" {
   type        = string
   description = "Path to the primary Microsoft Windows Server installer ISO file."
   default     = "./iso/dummy.iso"
 }
-
-variable "fod_iso" {
+variable "setup_iso_checksum" {
   type        = string
-  description = "Path to the Windows Server Features on Demand (FoD) ISO containing OpenSSH/extras."
-  default     = "./iso/dummy.iso"
-}
-
-variable "virtio_iso" {
-  type        = string
-  description = "Path to the VirtIO driver stack installer ISO used by QEMU networking and storage."
-  default     = "./iso/dummy.iso"
-}
-
-variable "driver_dir" {
-  type        = string
-  description = "Local directory supplying pre-extracted .inf driver payloads mapping to the boot A:\\ virtual floppy."
-  default     = "./driver/"
-}
-
-variable "update_iso" {
-  type        = string
-  description = "Path to the ISO file containing standalone Windows updates (.msu) at the root."
-  default     = "./iso/dummy.iso"
-}
-
-variable "extra_iso" {
-  type        = string
-  description = "Path to the ISO file containing standalone app installers (e.g., Windows Admin Center) at the root."
-  default     = "./iso/dummy.iso"
-}
-
-variable "script_file" {
-  type        = string
-  description = "Path to the primary bootstrap PowerShell script (setup.ps1) attached via virtual floppy."
-  default     = "./setup/setup.ps1"
+  description = "Path to the primary Microsoft Windows Server installer ISO file."
+  default     = "none"
 }
 
 variable "floppy_image" {
   type        = string
   description = "Path to the pre-compiled RAW Floppy Image payload governing the specific Server 2022 Edition deployment rules."
-  default     = "./floppy/win2022-standard-core-setup-qemu.img"
+  default     = "../../utility/dummy.img"
+}
+
+variable "fod_iso" {
+  type        = string
+  description = "Path to the Windows Server Features on Demand (FoD) ISO containing OpenSSH/extras."
+  default     = "../../utility/dummy.iso"
+}
+
+variable "virtio_iso" {
+  type        = string
+  description = "Path to the VirtIO driver stack installer ISO used by QEMU networking and storage."
+  default     = "../../utility/dummy.iso"
+}
+
+variable "update_iso" {
+  type        = string
+  description = "Path to the ISO file containing standalone Windows updates (.msu) at the root."
+  default     = "../../utility/dummy.iso"
+}
+
+variable "extra_iso" {
+  type        = string
+  description = "Path to the ISO file containing standalone app installers (e.g., Windows Admin Center) at the root."
+  default     = "../../utility/dummy.iso"
 }
 
 variable "output_dir" {

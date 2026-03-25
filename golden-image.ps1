@@ -108,9 +108,12 @@ if ($Gui) {
     Write-Host "GUI Mode: Enabled"
 }
 
+# Inject the common global architecture payload map
+$PackerArgs += "-var-file", "${Os}-common.pkrvars.hcl"
+
 if ($SetupMode) {
-    $PackerArgs += "-var", "setup_mode=$SetupMode"
-    Write-Host "Setup Mode: $SetupMode"
+    $PackerArgs += "-var-file", "${Os}-${SetupMode}.pkrvars.hcl"
+    Write-Host "Setup Edition Mode: $SetupMode"
 }
 
 if ($Name) {
@@ -175,15 +178,15 @@ if ($ToolsIso) {
     $PackerArgs += "-var", "tools_iso=$ResolvedToolsIso"
 }
 
-$VirtDir = "os\$Os\packer\$Virt"
+$VirtDir = "os\$Os"
 if (-not (Test-Path $VirtDir)) {
-    Write-Error "Virtualization platform '$Virt' is not implemented for OS '$Os'."
+    Write-Error "Architecture mapping '$Os' not found natively."
     exit 1
 }
 
 $PkrFiles = Get-ChildItem -Path $VirtDir -Filter "*.pkr.hcl" -ErrorAction SilentlyContinue
 if (-not $PkrFiles) {
-    Write-Error "No Packer templates found in $VirtDir"
+    Write-Error "No primary Packer templates found natively in $VirtDir"
     exit 1
 }
 
@@ -192,7 +195,8 @@ Push-Location $VirtDir
 # Set up logging
 $Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $ImageName = if ($Name) { $Name } else { "$Os-$Virt" }
-$LogDir = (Resolve-Path "..\..\..\..").Path + "\logs"
+# We push into /os/win2022, so root is ..\..
+$LogDir = (Resolve-Path "..\..").Path + "\logs"
 if (-not (Test-Path $LogDir)) {
     New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 }

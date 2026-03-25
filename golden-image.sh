@@ -151,9 +151,12 @@ if [[ $GUI -eq 1 ]]; then
     echo "GUI Mode: Enabled"
 fi
 
+# Inject the common global architecture payload map
+PACKER_ARGS+=("-var-file" "${OS}-common.pkrvars.hcl")
+
 if [[ -n "$SETUP_MODE" ]]; then
-    PACKER_ARGS+=("-var" "setup_mode=$SETUP_MODE")
-    echo "Setup Mode: $SETUP_MODE"
+    PACKER_ARGS+=("-var-file" "${OS}-${SETUP_MODE}.pkrvars.hcl")
+    echo "Setup Edition Mode: $SETUP_MODE"
 fi
 
 if [[ -n "$VM_NAME" ]]; then
@@ -215,24 +218,24 @@ if [[ -n "$TOOLS_ISO" ]]; then
     PACKER_ARGS+=("-var" "tools_iso=$RESOLVED_TOOLS_ISO")
 fi
 
-VIRT_DIR="os/$OS/packer/$VIRT"
+VIRT_DIR="os/$OS"
 if [[ ! -d "$VIRT_DIR" ]]; then
-    echo "Error: Virtualization platform '$VIRT' is not implemented for OS '$OS'."
+    echo "Error: Architecture mapping '$OS' not found natively."
     exit 1
 fi
 
 if ! ls "$VIRT_DIR"/*.pkr.hcl 1> /dev/null 2>&1; then
-    echo "Error: No Packer templates found in $VIRT_DIR"
+    echo "Error: No primary Packer templates found natively in $VIRT_DIR"
     exit 1
 fi
 
 cd "$VIRT_DIR"
 
-# Set up logging
+# Set up logging natively outputting to workspace
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 IMAGE_NAME=${VM_NAME:-"$OS-$VIRT"}
-LOG_FILE="$PWD/../../../../logs/${TIMESTAMP}-${IMAGE_NAME}.log"
-mkdir -p "$PWD/../../../../logs"
+LOG_FILE="$PWD/../../logs/${TIMESTAMP}-${IMAGE_NAME}.log"
+mkdir -p "$PWD/../../logs"
 
 echo "Logging output to: $LOG_FILE"
 

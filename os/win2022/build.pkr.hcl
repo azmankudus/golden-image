@@ -14,7 +14,7 @@ packer {
   }
 }
 
-source "qemu" "win2022" {
+source "qemu" "win" {
   # ----------------------------------------------------------------------------
   # KVM Architecture & Disk Format
   # Specifies the core hypervisor behavior and primary installation medium mapping.
@@ -31,7 +31,7 @@ source "qemu" "win2022" {
   format           = "qcow2"
   accelerator      = "kvm"    # Linux native hardware acceleration mapping
   output_directory = var.output_dir
-  vm_name          = "win2022.qcow2"
+  vm_name          = var.vm_name
 
   # ----------------------------------------------------------------------------
   # CPU, RAM, & Network Assignments
@@ -75,7 +75,7 @@ source "qemu" "win2022" {
 }
 
 build {
-  sources = ["source.qemu.win2022"]
+  sources = ["source.qemu.win"]
 
   # ============================================================================
   # Stage 1: Installation & Configuration Execution
