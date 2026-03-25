@@ -100,17 +100,27 @@ $cdroms = Get-Volume | Where-Object { $_.DriveType -eq 'CD-ROM' }
 
 Write-Host 'Installing Windows Admin Center in Gateway Mode...'
 $wacInstaller = $null
+$isMsi = $false
+
 foreach ($disk in $cdroms) {
-    $found = Get-ChildItem -Path "$($disk.DriveLetter):\" -Filter "WindowsAdminCenter*.exe" -ErrorAction SilentlyContinue
+    if (-not $disk.DriveLetter) { continue }
+    $found = Get-ChildItem -Path "$($disk.DriveLetter):\" -Filter "WindowsAdminCenter*.*" -Include "*.exe","*.msi" -ErrorAction SilentlyContinue | Select-Object -First 1
     if ($found) {
         $wacInstaller = $found.FullName
+        if ($found.Extension -ieq ".msi") { $isMsi = $true }
         break
     }
 }
 
 if ($wacInstaller) {
-    $arguments = '/quiet SME_PORT=443 SSL_CERTIFICATE_OPTION=generate'
-    Start-Process -FilePath $wacInstaller -ArgumentList $arguments -Wait -NoNewWindow
+    Write-Host "Evaluating payload: $wacInstaller"
+    if ($isMsi) {
+        $arguments = "/i `"$wacInstaller`" /qn ACCEPT_EULA=1 SME_PORT=443 SSL_CERTIFICATE_OPTION=generate"
+        Start-Process -FilePath "msiexec.exe" -ArgumentList $arguments -Wait -NoNewWindow
+    } else {
+        $arguments = '/quiet ACCEPT_EULA=1 SME_PORT=443 SSL_CERTIFICATE_OPTION=generate'
+        Start-Process -FilePath $wacInstaller -ArgumentList $arguments -Wait -NoNewWindow
+    }
 } else {
     Write-Warning "Windows Admin Center installer not found on any mounted ISO!"
 }
