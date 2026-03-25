@@ -22,8 +22,8 @@ source "qemu" "win" {
   iso_url          = var.setup_iso
   iso_checksum     = var.setup_iso_checksum
   
-  # Requires passing VirtIO SCSI drivers during Windows PE setup to successfully find the drive
-  disk_interface   = "virtio-scsi" 
+  # Requires passing VirtIO BLK drivers during Windows PE setup to successfully find the drive
+  disk_interface   = "virtio" 
   disk_size        = var.disk_size
   disk_discard     = "unmap"  # Enable TRIM/UNMAP for thin provisioning / sparse sizing
   disk_cache       = "unsafe" # Maximum speed mapping bypassing host sync operations

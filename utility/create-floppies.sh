@@ -34,6 +34,9 @@ for EDITION in "${EDITIONS[@]}"; do
     mcopy -i "$IMG_FILE" "${BASE_DIR}/qemu/vioscsi.inf" ::/
     mcopy -i "$IMG_FILE" "${BASE_DIR}/qemu/vioscsi.sys" ::/
     mcopy -i "$IMG_FILE" "${BASE_DIR}/qemu/vioscsi.cat" ::/
+    mcopy -i "$IMG_FILE" "${BASE_DIR}/qemu/viostor.inf" ::/
+    mcopy -i "$IMG_FILE" "${BASE_DIR}/qemu/viostor.sys" ::/
+    mcopy -i "$IMG_FILE" "${BASE_DIR}/qemu/viostor.cat" ::/
   fi
 done
 
