@@ -43,23 +43,7 @@ source "qemu" "win2022" {
   # Network specification: Using SLIRP user network to avoid bridge acl mapping errors
   net_device       = "virtio-net"
 
-  # ----------------------------------------------------------------------------
-  # Unattended Configuration Payload
-  # Using floppy mapping (A:\) avoids CD-ROM multi-drive scanning conflicts and
-  # instantly supplies Autounattend.xml to the Windows setup environment natively.
-  # ----------------------------------------------------------------------------
-  floppy_files     = [
-    var.unattend_file,
-    var.script_file
-  ]
-  
-  # ----------------------------------------------------------------------------
-  # Pre-OS Driver Injection
-  # Extracts the core boot-critical VirtIO components (Viostor/Vioscsi/etc.)
-  # Windows PE universally scopes the root A:\ directory for valid .inf files. 
-  # DO NOT load massive gigabyte payloads into the floppy; it has a rigid 1.44MB cap.
-  # ----------------------------------------------------------------------------
-  floppy_dirs      = [var.driver_dir]
+
 
   # ----------------------------------------------------------------------------
   # BIOS Prompt Interception (Bypass ISO "Press any key...")
@@ -73,6 +57,7 @@ source "qemu" "win2022" {
   # the primary ISO when `-drive` is detected in QEMU args.
   # ----------------------------------------------------------------------------
   qemuargs = [
+    [ "-fda", "floppy_image.img" ],                              # Static Pre-Compiled Floppy Injection
     [ "--drive", "file=${var.virtio_iso},media=cdrom,index=2" ], # VirtIO Guest Tools ISO
     [ "--drive", "file=${var.fod_iso},media=cdrom,index=1" ],    # Features on Demand ISO
     [ "--drive", "file=${var.update_iso},media=cdrom,index=3" ], # Custom Windows Update ISO
