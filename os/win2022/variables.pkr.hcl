@@ -46,10 +46,10 @@ variable "script_file" {
   default     = "./setup/setup.ps1"
 }
 
-variable "unattend_file" {
+variable "floppy_image" {
   type        = string
-  description = "Path to the XML answer file providing native zero-touch rules for Windows setup engine."
-  default     = "./setup/win2022-autounattend-standard-core.xml"
+  description = "Path to the pre-compiled RAW Floppy Image payload governing the specific Server 2022 Edition deployment rules."
+  default     = "./floppy/win2022-standard-core-setup-qemu.img"
 }
 
 variable "output_dir" {

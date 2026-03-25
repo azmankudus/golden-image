@@ -55,7 +55,7 @@ source "qemu" "win2022" {
   # the primary ISO when `-drive` is detected in QEMU args.
   # ----------------------------------------------------------------------------
   qemuargs = [
-    [ "-fda", "floppy_image.img" ],                              # Static Pre-Compiled Floppy Injection
+    [ "-fda", "${var.floppy_image}" ],                           # Static Pre-Compiled Floppy Injection
     [ "--drive", "file=${var.virtio_iso},media=cdrom,index=2" ], # VirtIO Guest Tools ISO
     [ "--drive", "file=${var.fod_iso},media=cdrom,index=1" ],    # Features on Demand ISO
     [ "--drive", "file=${var.update_iso},media=cdrom,index=3" ], # Custom Windows Update ISO
