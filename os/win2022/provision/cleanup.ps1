@@ -6,6 +6,12 @@
 # sparse .qcow2 hard drive artifact perfectly.
 # ==============================================================================
 
+Write-Host "Disabling Administrator AutoLogon Security Vulnerabilities..."
+Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "AutoAdminLogon" -ErrorAction SilentlyContinue
+Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "DefaultUserName" -ErrorAction SilentlyContinue
+Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "DefaultPassword" -ErrorAction SilentlyContinue
+Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Winlogon" -Name "DefaultDomainName" -ErrorAction SilentlyContinue
+
 Write-Host "Cleaning up staging artifacts..."
 Remove-Item -Path C:\Temp -Recurse -Force -ErrorAction SilentlyContinue
 
