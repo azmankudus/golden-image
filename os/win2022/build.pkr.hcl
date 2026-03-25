@@ -43,8 +43,6 @@ source "qemu" "win2022" {
   # Network specification: Using SLIRP user network to avoid bridge acl mapping errors
   net_device       = "virtio-net"
 
-
-
   # ----------------------------------------------------------------------------
   # BIOS Prompt Interception (Bypass ISO "Press any key...")
   # ----------------------------------------------------------------------------

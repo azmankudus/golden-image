@@ -48,8 +48,8 @@ variable "script_file" {
 
 variable "unattend_file" {
   type        = string
-  description = "Path to the autounattend.xml answer file providing native zero-touch rules for Windows setup engine."
-  default     = "./setup/autounattend.xml"
+  description = "Path to the XML answer file providing native zero-touch rules for Windows setup engine."
+  default     = "./setup/win2022-autounattend-standard-core.xml"
 }
 
 variable "output_dir" {
