@@ -55,14 +55,14 @@ source "qemu" "win" {
   # the primary ISO when `-drive` is detected in QEMU args.
   # ----------------------------------------------------------------------------
   qemuargs = [
-    [ "-drive", "file=${var.floppy_image},format=raw,if=floppy" ], # Static Pre-Compiled RAW Floppy Injection mapping bypassing probe warnings
-    [ "-device", "ahci,id=ahci0" ],                                # Inject local AHCI Controller structure to bypass the 4-Device IDE hard limit
-    [ "--drive", "file=${var.virtio_iso},media=cdrom,index=1" ],   # VirtIO Guest Tools ISO (Primary IDE Slave)
-    [ "--drive", "file=${var.fod_iso},media=cdrom,index=2" ],      # Features on Demand ISO (Secondary IDE Master)
-    [ "-drive", "file=${var.update_iso},media=cdrom,if=none,id=update_iso" ],
-    [ "-device", "ide-cd,bus=ahci0.0,drive=update_iso" ],          # Custom Windows Update ISO (SATA Port 0)
-    [ "-drive", "file=${var.extra_iso},media=cdrom,if=none,id=extra_iso" ],
-    [ "-device", "ide-cd,bus=ahci0.1,drive=extra_iso" ]            # Custom Application / Extra ISO (SATA Port 1)
+    [ "--drive", "file=${var.floppy_image},format=raw,if=floppy" ], # Static Pre-Compiled RAW Floppy Injection mapping bypassing probe warnings
+    [ "-device", "ahci,id=ahci0" ],                                 # Inject local AHCI Controller structure to bypass the 4-Device IDE hard limit
+    [ "--drive", "file=${var.virtio_iso},media=cdrom,index=1" ],    # VirtIO Guest Tools ISO (Primary IDE Slave)
+    [ "--drive", "file=${var.fod_iso},media=cdrom,index=2" ],       # Features on Demand ISO (Secondary IDE Master)
+    [ "--drive", "file=${var.update_iso},media=cdrom,if=none,id=update_iso" ],
+    [ "-device", "ide-cd,bus=ahci0.0,drive=update_iso" ],           # Custom Windows Update ISO (SATA Port 0)
+    [ "--drive", "file=${var.extra_iso},media=cdrom,if=none,id=extra_iso" ],
+    [ "-device", "ide-cd,bus=ahci0.1,drive=extra_iso" ]             # Custom Application / Extra ISO (SATA Port 1)
   ]
 
   # ----------------------------------------------------------------------------
