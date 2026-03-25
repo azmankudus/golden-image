@@ -20,7 +20,7 @@ source "qemu" "win" {
   # Specifies the core hypervisor behavior and primary installation medium mapping.
   # ----------------------------------------------------------------------------
   iso_url          = var.setup_iso
-  iso_checksum     = "none"
+  iso_checksum     = var.setup_iso_checksum
   
   # Requires passing VirtIO SCSI drivers during Windows PE setup to successfully find the drive
   disk_interface   = "virtio-scsi" 

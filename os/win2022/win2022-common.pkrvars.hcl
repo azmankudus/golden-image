@@ -9,7 +9,7 @@
 # Core Setup Media
 # ------------------------------------------------------------------------------
 setup_iso  = "/work/installer/winserver2022/iso/en-us_windows_server_2022_x64_dvd_620d7eac.iso"
-setup_iso_checksum = "file:///work/installer/winserver2022/iso/en-us_windows_server_2022_x64_dvd_620d7eac.iso.sha256"
+setup_iso_checksum = "file:/work/installer/winserver2022/iso/en-us_windows_server_2022_x64_dvd_620d7eac.iso.sha256"
 
 # fod_iso    = "/work/installer/winserver2022/iso/20348.1.210507-1500.fe_release_amd64fre_SERVER_LOF_PACKAGES_OEM.iso"
 virtio_iso = "/work/installer/virtio/virtio-win-0.1.285.iso"
