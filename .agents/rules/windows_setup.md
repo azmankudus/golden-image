@@ -2,13 +2,15 @@
 
 When an agent interacts with Windows Server Packer configurations, the following strict boundaries MUST be observed to prevent broken zero-touch builds.
 
-## 1. Answer File Delivery (Autounattend.xml)
+## 1. Static Floppy Injection (VFD)
 - **NEVER** use `cd_files` to deliver the `autounattend.xml`. Windows PE is inconsistent at reading CD-ROMs if multiple are present.
-- **ALWAYS** use `floppy_files = ["../../unattended/autounattend.xml"]` to map the answer file to the `A:\` drive, which Windows PE parses natively without fail.
+- **NEVER** use Packer's native `floppy_files` or `floppy_dirs` to dynamically build virtual floppies. Large payloads crash Packer with `FAT FULL` pipeline exceptions!
+- **ALWAYS** explicitly generate static 1.44MB `.img` payloads using `utility/create-floppies.sh` (via `mtools`/`mkfs.fat`).
+- **ALWAYS** map these statically compiled payloads strictly in `qemuargs` using `[ "-fda", "${var.floppy_image}" ]` for deterministic mapping!
 
 ## 2. Driver Injection & Limitations
-- **NEVER** use `floppy_dirs` to inject large VirtIO driver payloads (like the complete Red Hat 21MB+ ISO including `.pdb` debug symbols). Virtual floppy disks have a hard limit of `1.44MB`. Doing so will crash Packer with a `FAT FULL` error.
-- **ALWAYS** extract only the essential `.inf`, `.cat`, and `.sys` files (usually ~400KB total) into a local `drivers/` folder and mount them via `floppy_dirs`. Windows PE will automatically scan the root and all subdirectories of the floppy drive (A:\) and install the drivers natively, making them available for both Windows PE and the target OS image. Avoid using `drvload` as it only injects into the temporary PE environment and breaks the target OS boot.
+- **ALWAYS** extract only the essential VirtIO components (`.inf`, `.sys`, `.cat` - ~400KB total) directly into the local `qemu/` folder.
+- **ALWAYS** rely on the `create-floppies.sh` orchestrator to natively embed these drivers onto the runtime floppy image payload, as Windows PE scans the `A:\` root recursively during bootstrap!
 
 ## 3. QEMU CD-ROM Boot Sequencing
 - **NEVER** map secondary tool ISOs using QEMU's `-cdrom` argument or a bare `-drive` argument. This intercepts QEMU's `index=0` and causes it to boot into the tools ISO instead of the OS installer.

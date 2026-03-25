@@ -31,14 +31,16 @@ Welcome to the **Golden Image Builder**! This project provides a universal, scal
 │   └── upload-config.schema.json
 └── os/                       # OS Templates Hub
     └── win2022/              # Windows Server 2022 Golden Image Architecture
-        ├── build.pkr.hcl            # Native QEMU / KVM Packer Build Rules
-        ├── variables.pkr.hcl        # Input Parameter Definitions
-        ├── project.auto.pkrvars.hcl # Environment-Specific Variable Overrides
-        ├── driver/                  # Uncompressed Pre-OS VirtIO Boots Drivers
-        ├── provision/               # Application-level Internal Bootstrapping
-        ├── setup/                   # WinPE OOBE Scripts and Autounattend
-        ├── update/                  # Staged .msu Cumulative Patches
-        └── extra/                   # External Tool Uploads (e.g. WAC)
+        ├── build.pkr.hcl                    # Native QEMU / KVM Packer Build Rules
+        ├── variables.pkr.hcl                # Input Parameter Definitions
+        ├── win2022-common.pkrvars.hcl       # Universal ISO/Media Variable Overrides
+        ├── win2022-[edition].pkrvars.hcl    # Edition-Specific Variable Templates
+        ├── qemu/                            # Uncompressed Pre-OS VirtIO Boot Drivers
+        ├── floppy/                          # Statically Compiled Runtime VFD MS-DOS Payloads
+        ├── provision/                       # Application-level Internal Bootstrapping
+        ├── setup/                           # WinPE OOBE Scripts and Autounattend
+        ├── update/                          # Staged .msu Cumulative Patches
+        └── extra/                           # External Tool Uploads (e.g. WAC)
 ```
 
 ---
@@ -56,9 +58,9 @@ Welcome to the **Golden Image Builder**! This project provides a universal, scal
 
 # Create Windows Server 2022 Base Image with specific setup mode, ISOs, and custom hardware
 # Additionally, display the GUI screen during the build process
-./golden-image.sh --os win2022 --virt libvirt --mode base \
+./golden-image.sh --os win2022 --virt qemu --mode base \
   --cpu 1 --memory 1024 --disk-size 204800 \
-  --setup-mode "server core" \
+  --setup-mode datacenter-desktop \
   --gui \
   --iso "file:///work/iso/en-us_windows_server_2022_updated_feb_2026_x64_dvd_09efea0d.iso" \
   --tools-iso "file:///work/iso/virtio-win-0.1.285.iso"
