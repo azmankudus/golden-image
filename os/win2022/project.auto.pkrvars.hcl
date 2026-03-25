@@ -14,10 +14,10 @@ virtio_iso = "/work/installer/virtio/virtio-win-0.1.285.iso"
 
 # ------------------------------------------------------------------------------
 # Auxiliary Provisioning Assets
-# Directories containing KB updates and external binaries (e.g. WAC) to push
+# Pre-compiled ISOs containing standalone KBs and binaries (e.g. WAC) to push
 # ------------------------------------------------------------------------------
-update_dir = "/work/installer/winserver2022/update/"
-extra_dir  = "/work/installer/winserver2022/extra/"
+update_iso = "/work/installer/winserver2022/iso/win2022-update-2026-03.iso"
+extra_iso  = "/work/installer/winserver2022/iso/win2022-extra-2026-03-25.iso"
 
 # ------------------------------------------------------------------------------
 # Artifact Output Configuration

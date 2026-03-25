@@ -74,7 +74,9 @@ source "qemu" "win2022" {
   # ----------------------------------------------------------------------------
   qemuargs = [
     [ "--drive", "file=${var.virtio_iso},media=cdrom,index=2" ], # VirtIO Guest Tools ISO
-    [ "--drive", "file=${var.fod_iso},media=cdrom,index=1" ]    # Features on Demand ISO
+    [ "--drive", "file=${var.fod_iso},media=cdrom,index=1" ],    # Features on Demand ISO
+    [ "--drive", "file=${var.update_iso},media=cdrom,index=3" ], # Custom Windows Update ISO
+    [ "--drive", "file=${var.extra_iso},media=cdrom,index=4" ]   # Custom Application / Extra ISO
   ]
 
   # ----------------------------------------------------------------------------
@@ -93,29 +95,7 @@ build {
   sources = ["source.qemu.win2022"]
 
   # ============================================================================
-  # Stage 1: Preparation
-  # Prepare the internal VM temporary directories for ingesting deployment assets.
-  # ============================================================================
-  provisioner "powershell" {
-    script = "./provision/prepare.ps1"
-  }
-
-  # ============================================================================
-  # Stage 2: In-Flight Data Transfer
-  # Move the extracted Microsoft Updates (.msu) and auxiliary installers (WAC).
-  # ============================================================================
-  provisioner "file" {
-    source      = var.update_dir
-    destination = "C:\\Temp\\update"
-  }
-
-  provisioner "file" {
-    source      = var.extra_dir
-    destination = "C:\\Temp\\extra"
-  }
-
-  # ============================================================================
-  # Stage 3: Installation & Configuration Execution
+  # Stage 1: Installation & Configuration Execution
   # Natively install cumulative patches and standalone gateways synchronously.
   # ============================================================================
   provisioner "powershell" {
@@ -123,7 +103,7 @@ build {
   }
 
   # ============================================================================
-  # Stage 4: Artifact Purging & Drive Compaction
+  # Stage 2: Artifact Purging & Drive Compaction
   # Shrink and zero out the disk blocks occupied by temporary setup files.
   # ============================================================================
   provisioner "powershell" {
@@ -131,7 +111,7 @@ build {
   }
 
   # ============================================================================
-  # Stage 5: System Reboot Initialization
+  # Stage 3: System Reboot Initialization
   # Commits Microsoft's `.msu` update cascades strictly prior to shutting down.
   # ============================================================================
   provisioner "windows-restart" {

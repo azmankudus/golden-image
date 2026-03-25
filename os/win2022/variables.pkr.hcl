@@ -7,19 +7,19 @@
 variable "setup_iso" {
   type        = string
   description = "Path to the primary Microsoft Windows Server installer ISO file."
-  default     = "./iso/en-us_windows_server_2022_x64_dvd_620d7eac.iso"
+  default     = "./iso/dummy.iso"
 }
 
 variable "fod_iso" {
   type        = string
   description = "Path to the Windows Server Features on Demand (FoD) ISO containing OpenSSH/extras."
-  default     = "./iso/20348.1.210507-1500.fe_release_amd64fre_SERVER_LOF_PACKAGES_OEM.iso"
+  default     = "./iso/dummy.iso"
 }
 
 variable "virtio_iso" {
   type        = string
   description = "Path to the VirtIO driver stack installer ISO used by QEMU networking and storage."
-  default     = "./iso/virtio-win-0.1.285.iso"
+  default     = "./iso/dummy.iso"
 }
 
 variable "driver_dir" {
@@ -28,16 +28,16 @@ variable "driver_dir" {
   default     = "./driver/"
 }
 
-variable "update_dir" {
+variable "update_iso" {
   type        = string
-  description = "Local directory supplying .msu patch packages for upload to VM via File provisioner."
-  default     = "./update/"
+  description = "Path to the ISO file containing standalone Windows updates (.msu) at the root."
+  default     = "./iso/dummy.iso"
 }
 
-variable "extra_dir" {
+variable "extra_iso" {
   type        = string
-  description = "Local directory supplying standalone app installers (e.g., Windows Admin Center) to VM."
-  default     = "./extra/"
+  description = "Path to the ISO file containing standalone app installers (e.g., Windows Admin Center) at the root."
+  default     = "./iso/dummy.iso"
 }
 
 variable "script_file" {
