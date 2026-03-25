@@ -93,3 +93,15 @@ variable "winrm_timeout" {
   description = "Upper-bound fallback deadline before Packer declares the machine completely headless / locked."
   default     = "30m"
 }
+
+variable "is_vagrant" {
+  type        = bool
+  description = "Triggers the Vagrant PKI logically natively mapping inside the HCL."
+  default     = false
+}
+
+variable "setup_mode" {
+  type        = string
+  description = "Defines the specific explicit template mapping flavor natively resolving the target topology execution."
+  default     = ""
+}

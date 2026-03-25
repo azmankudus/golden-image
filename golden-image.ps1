@@ -54,33 +54,41 @@ function Resolve-Or-Fetch-Iso {
         if (-not (Test-Path $DestFile)) {
             Write-Host "Downloading $Uri to $DestFile via AWS CLI..."
             aws s3 cp $Uri $DestFile
-        } else {
+        }
+        else {
             Write-Host "Cached ISO found: $DestFile"
         }
         return $DestFile
-    } elseif ($Uri -match "^smb://") {
+    }
+    elseif ($Uri -match "^smb://") {
         if (-not (Test-Path $DestFile)) {
             Write-Host "Downloading $Uri to $DestFile..."
             $SmbPath = $Uri -replace "^smb://", "\\" -replace "/", "\"
             Copy-Item -Path $SmbPath -Destination $DestFile
-        } else {
+        }
+        else {
             Write-Host "Cached ISO found: $DestFile"
         }
         return $DestFile
-    } elseif ($Uri -match "^(http|https|ftp|ftps|sftp)://") {
+    }
+    elseif ($Uri -match "^(http|https|ftp|ftps|sftp)://") {
         if (-not (Test-Path $DestFile)) {
             Write-Host "Downloading $Uri to $DestFile..."
             Invoke-WebRequest -Uri $Uri -OutFile $DestFile
-        } else {
+        }
+        else {
             Write-Host "Cached ISO found: $DestFile"
         }
         return $DestFile
-    } elseif ($Uri -match "^file://") {
+    }
+    elseif ($Uri -match "^file://") {
         $LocalPath = $Uri -replace "^file://", ""
         return $LocalPath
-    } elseif ([System.IO.Path]::IsPathRooted($Uri)) {
+    }
+    elseif ([System.IO.Path]::IsPathRooted($Uri)) {
         return $Uri
-    } else {
+    }
+    else {
         return (Resolve-Path $Uri).Path
     }
 }
@@ -94,7 +102,8 @@ if (-not (Test-Path "output")) {
     if (Test-Path "/work/golden-image") {
         New-Item -ItemType Directory -Force -Path "/work/golden-image/output" | Out-Null
         New-Item -ItemType SymbolicLink -Path "output" -Target "/work/golden-image/output" | Out-Null
-    } else {
+    }
+    else {
         New-Item -ItemType Directory -Force -Path "output" | Out-Null
     }
 }
@@ -108,12 +117,24 @@ if ($Gui) {
     Write-Host "GUI Mode: Enabled"
 }
 
-# Inject the common global architecture payload map
-$PackerArgs += "-var-file", "${Os}-common.pkrvars.hcl"
-
 if ($SetupMode) {
-    $PackerArgs += "-var-file", "${Os}-${SetupMode}.pkrvars.hcl"
-    Write-Host "Setup Edition Mode: $SetupMode"
+    $PackerArgs += "-var", "setup_mode=$SetupMode"
+    Write-Host "Setup Mode: $SetupMode"
+    
+    if ($Mode -eq "vagrant") {
+        $PackerArgs += "-var", "floppy_image=../../floppy/${Os}-${SetupMode}-setup-vagrant.img"
+    } else {
+        $PackerArgs += "-var", "floppy_image=../../floppy/${Os}-${SetupMode}-setup-qemu.img"
+    }
+}
+
+if ($Mode -eq "vagrant") {
+    Write-Host "Output Mode: Vagrant Box Compile"
+    $PackerArgs += "-var", "is_vagrant=true"
+    $PackerArgs += "-var", "winrm_password=vagrant"
+} else {
+    Write-Host "Output Mode: Generic QEMU Artifact"
+    $PackerArgs += "-except=qemu.vagrant-box"
 }
 
 if ($Name) {
@@ -178,15 +199,15 @@ if ($ToolsIso) {
     $PackerArgs += "-var", "tools_iso=$ResolvedToolsIso"
 }
 
-$VirtDir = "os\$Os"
+$VirtDir = "os\$Os\packer\$Virt"
 if (-not (Test-Path $VirtDir)) {
-    Write-Error "Architecture mapping '$Os' not found natively."
+    Write-Error "Virtualization platform '$Virt' is not implemented for OS '$Os'."
     exit 1
 }
 
 $PkrFiles = Get-ChildItem -Path $VirtDir -Filter "*.pkr.hcl" -ErrorAction SilentlyContinue
 if (-not $PkrFiles) {
-    Write-Error "No primary Packer templates found natively in $VirtDir"
+    Write-Error "No Packer templates found in $VirtDir"
     exit 1
 }
 
@@ -195,8 +216,7 @@ Push-Location $VirtDir
 # Set up logging
 $Timestamp = Get-Date -Format "yyyyMMdd_HHmmss"
 $ImageName = if ($Name) { $Name } else { "$Os-$Virt" }
-# We push into /os/win2022, so root is ..\..
-$LogDir = (Resolve-Path "..\..").Path + "\logs"
+$LogDir = (Resolve-Path "..\..\..\..").Path + "\logs"
 if (-not (Test-Path $LogDir)) {
     New-Item -ItemType Directory -Force -Path $LogDir | Out-Null
 }

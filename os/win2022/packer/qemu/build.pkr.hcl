@@ -11,6 +11,10 @@ packer {
       version = "~> 1.0"
       source  = "github.com/hashicorp/qemu"
     }
+    vagrant = {
+      version = "~> 1.0"
+      source  = "github.com/hashicorp/vagrant"
+    }
   }
 }
 
@@ -85,7 +89,14 @@ build {
   # Natively install cumulative patches and standalone gateways synchronously.
   # ============================================================================
   provisioner "powershell" {
-    script = "./provision/install.ps1"
+    script = "../../provision/install.ps1"
+  }
+
+  # ============================================================================
+  # Stage 1.5: Optional Vagrant Telemetry and Post-Build Overrides
+  # ============================================================================
+  provisioner "powershell" {
+    inline = var.is_vagrant ? ["powershell.exe -ExecutionPolicy Bypass -File ..\\..\\provision\\vagrant.ps1"] : ["Write-Output 'Skipping Vagrant setup.'"]
   }
 
   # ============================================================================
@@ -93,7 +104,7 @@ build {
   # Shrink and zero out the disk blocks occupied by temporary setup files.
   # ============================================================================
   provisioner "powershell" {
-    script = "./provision/cleanup.ps1"
+    script = "../../provision/cleanup.ps1"
   }
 
   # ============================================================================
@@ -102,5 +113,11 @@ build {
   # ============================================================================
   provisioner "windows-restart" {
     restart_timeout = "15m"
+  }
+
+  post-processor "vagrant" {
+    name                = "vagrant-box"
+    keep_input_artifact = true
+    output              = "${var.output_dir}/${var.vm_name}.box"
   }
 }

@@ -155,8 +155,22 @@ fi
 PACKER_ARGS+=("-var-file" "${OS}-common.pkrvars.hcl")
 
 if [[ -n "$SETUP_MODE" ]]; then
-    PACKER_ARGS+=("-var-file" "${OS}-${SETUP_MODE}.pkrvars.hcl")
-    echo "Setup Edition Mode: $SETUP_MODE"
+    PACKER_ARGS+=("-var" "setup_mode=$SETUP_MODE")
+    echo "Setup Mode: $SETUP_MODE"
+    if [[ "$MODE" == "vagrant" ]]; then
+        PACKER_ARGS+=("-var" "floppy_image=../../floppy/${OS}-${SETUP_MODE}-setup-vagrant.img")
+    else
+        PACKER_ARGS+=("-var" "floppy_image=../../floppy/${OS}-${SETUP_MODE}-setup-qemu.img")
+    fi
+fi
+
+if [[ "$MODE" == "vagrant" ]]; then
+    echo "Output Mode: Vagrant Box Compile"
+    PACKER_ARGS+=("-var" "is_vagrant=true")
+    PACKER_ARGS+=("-var" "winrm_password=vagrant")
+else
+    echo "Output Mode: Generic QEMU Artifact"
+    PACKER_ARGS+=("-except=qemu.vagrant-box")
 fi
 
 if [[ -n "$VM_NAME" ]]; then
@@ -218,9 +232,9 @@ if [[ -n "$TOOLS_ISO" ]]; then
     PACKER_ARGS+=("-var" "tools_iso=$RESOLVED_TOOLS_ISO")
 fi
 
-VIRT_DIR="os/$OS"
+VIRT_DIR="os/$OS/packer/$VIRT"
 if [[ ! -d "$VIRT_DIR" ]]; then
-    echo "Error: Architecture mapping '$OS' not found natively."
+    echo "Error: Architecture mapping '$VIRT_DIR' not found natively."
     exit 1
 fi
 
@@ -234,8 +248,8 @@ cd "$VIRT_DIR"
 # Set up logging natively outputting to workspace
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
 IMAGE_NAME=${VM_NAME:-"$OS-$VIRT"}
-LOG_FILE="$PWD/../../logs/${TIMESTAMP}-${IMAGE_NAME}.log"
-mkdir -p "$PWD/../../logs"
+LOG_FILE="$PWD/../../../../logs/${TIMESTAMP}-${IMAGE_NAME}.log"
+mkdir -p "$PWD/../../../../logs"
 
 echo "Logging output to: $LOG_FILE"
 

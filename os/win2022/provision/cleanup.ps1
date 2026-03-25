@@ -1,4 +1,4 @@
-# ==============================================================================
+Remove-Item -Path C:\Temp -Recurse -Force -ErrorAction SilentlyContinue
 # Script: cleanup.ps1
 # Description: Purges the temporary file staging ground (C:\Temp) to ensure 
 # the exported golden image remains compact and secure. Additionally 
